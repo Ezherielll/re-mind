@@ -1,6 +1,11 @@
 # CONTEXT.md
 
-FollowUp is a personal commitment and follow-up management system. It tracks **two-way open loops** between the user and other people — promises the user made and outcomes the user is waiting on — so nothing stays unresolved after a conversation ends. Beachhead user: freelancers and solo professionals working in a personal (non-team) context. Local-first; data never leaves the device unless the user exports it.
+Re:Mind is a personal commitment and follow-up management system. It tracks **two-way open loops** between the user and other people — promises the user made and outcomes the user is waiting on — so nothing stays unresolved after a conversation ends. Beachhead user: freelancers and solo professionals working in a personal (non-team) context. Local-first; data never leaves the device unless the user exports it.
+
+## Naming
+
+- **Display/brand name:** Re:Mind (with colon) — UI, store listing, marketing.
+- **Identifier form:** ReMind / `re_mind` (colon-free) — package name, application ID, code identifiers, URLs, anywhere special characters are invalid.
 
 This file is the canonical vocabulary of the project. Use these terms in issues, tests, refactors, and UI copy. Don't drift to synonyms.
 
