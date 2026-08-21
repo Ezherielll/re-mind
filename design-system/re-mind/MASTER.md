@@ -232,7 +232,7 @@ Decisions on what is adopted, adapted, or rejected from the generated system —
 
 ### Adopted
 
-- **Color palette as-is**: teal primary #0D9488 (calm focus) + orange accent #EA580C (action/nudge, WCAG-adjusted) + destructive #DC2626. Map to Flutter ColorScheme.fromSeed(seedColor: #0D9488) with accent override; provide full darkTheme.
+- **Color palette as-is**: teal primary #0D9488 (calm focus) + orange accent #EA580C (action/nudge, WCAG-adjusted) + destructive #DC2626. Map to Flutter ColorScheme.fromSeed(seedColor: #0D9488) with primary pinned to the exact token and accent override; provide full darkTheme. Scaffold backgrounds: light #F0FDFA, dark #0C1615 (calm near-black teal — reviewed adaptation).
 - **Minimalism direction**: high contrast, generous whitespace, quiet chrome.
 - **Anti-patterns**: no complex onboarding (matches ADR-0008/decision #9), no slow performance.
 

@@ -3,6 +3,6 @@
   "appName": "Re:Mind",
   "homeTitle": "Open loops",
   "homeEmptyTitle": "Nothing hanging right now.",
-  "homeEmptyBody": "Capture a commitment and it will show up here.",
+  "homeEmptyCta": "Capture your first loop",
   "homeCaptureLabel": "Capture"
 }

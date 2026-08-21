@@ -10,6 +10,7 @@ void main() {
     expect(find.text('Open loops'), findsOneWidget);
     expect(find.text('0'), findsOneWidget);
     expect(find.text('Nothing hanging right now.'), findsOneWidget);
+    expect(find.text('Capture your first loop'), findsOneWidget);
     expect(find.byType(FloatingActionButton), findsOneWidget);
   });
 }

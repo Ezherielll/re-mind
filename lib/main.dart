@@ -15,7 +15,7 @@ class ReMindApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Re:Mind',
+      onGenerateTitle: (context) => AppLocalizations.of(context).appName,
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,
       localizationsDelegates: AppLocalizations.localizationsDelegates,

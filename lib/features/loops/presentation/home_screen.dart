@@ -11,6 +11,14 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final display = TextStyle(
+      inherit: false,
+      fontFamily: Theme.of(context).textTheme.bodyLarge?.fontFamily,
+      fontSize: 28,
+      fontWeight: FontWeight.w700,
+      letterSpacing: -0.02,
+      color: Theme.of(context).colorScheme.onSurface,
+    );
     return Scaffold(
       body: SafeArea(
         child: Padding(
@@ -19,39 +27,22 @@ class HomeScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 24),
-              Text(
-                l10n.homeTitle,
-                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: -0.02,
-                    ),
-              ),
+              Text(l10n.homeTitle, style: display),
               Expanded(
                 child: Center(
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text(
-                        '0',
-                        style:
-                            Theme.of(context).textTheme.displayLarge?.copyWith(
-                                  fontWeight: FontWeight.w700,
-                                  letterSpacing: -0.02,
-                                ),
-                      ),
+                      Text('0', style: display.copyWith(fontSize: 64)),
                       const SizedBox(height: 8),
                       Text(
                         l10n.homeEmptyTitle,
                         style: Theme.of(context).textTheme.titleMedium,
                       ),
-                      const SizedBox(height: 4),
-                      Text(
-                        l10n.homeEmptyBody,
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onSurfaceVariant,
-                            ),
+                      const SizedBox(height: 16),
+                      TextButton(
+                        onPressed: () {},
+                        child: Text(l10n.homeEmptyCta),
                       ),
                     ],
                   ),

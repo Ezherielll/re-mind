@@ -112,11 +112,11 @@ abstract class AppLocalizations {
   /// **'Nothing hanging right now.'**
   String get homeEmptyTitle;
 
-  /// No description provided for @homeEmptyBody.
+  /// No description provided for @homeEmptyCta.
   ///
   /// In en, this message translates to:
-  /// **'Capture a commitment and it will show up here.'**
-  String get homeEmptyBody;
+  /// **'Capture your first loop'**
+  String get homeEmptyCta;
 
   /// No description provided for @homeCaptureLabel.
   ///

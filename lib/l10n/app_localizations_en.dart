@@ -18,7 +18,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homeEmptyTitle => 'Nothing hanging right now.';
 
   @override
-  String get homeEmptyBody => 'Capture a commitment and it will show up here.';
+  String get homeEmptyCta => 'Capture your first loop';
 
   @override
   String get homeCaptureLabel => 'Capture';

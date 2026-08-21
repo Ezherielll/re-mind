@@ -24,7 +24,7 @@ abstract final class AppTheme {
       brightness: brightness,
       secondary: AppColors.secondary,
       error: AppColors.destructive,
-    );
+    ).copyWith(primary: AppColors.primary);
     return ThemeData(
       useMaterial3: true,
       colorScheme: scheme,
