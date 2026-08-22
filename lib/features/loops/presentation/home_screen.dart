@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -5,6 +7,7 @@ import '../../../core/domain/commitment.dart';
 import '../../../core/domain/derived_status.dart';
 import '../../../l10n/app_localizations.dart';
 import '../data/providers.dart';
+import '../data/reminder_coordinator.dart';
 import 'capture_sheet.dart';
 import 'home_groups.dart';
 import 'loop_detail_screen.dart';
@@ -33,6 +36,15 @@ class HomeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final loops = ref.watch(openLoopsProvider);
+    // Keep scheduled item alerts in sync with the open-loop list (T07).
+    ref.listen(openLoopsProvider, (_, next) {
+      final items = next.value;
+      if (items != null) {
+        unawaited(
+          ref.read(reminderCoordinatorProvider).sync(items),
+        );
+      }
+    });
     final totalOpen = loops.value?.length ?? 0;
     return Scaffold(
       body: SafeArea(
