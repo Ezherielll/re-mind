@@ -238,8 +238,10 @@ class DriftLoopsRepository implements LoopsRepository {
     await _db.transaction(() async {
       await (_db.update(_db.commitments)..where((c) => c.id.equals(id)))
           .write(CommitmentsCompanion(
+        // Keep followUpAt so Reopen restores the loop "with previous dates"
+        // (pages/loop-detail.md); done loops never receive nudges because
+        // all nudge queries filter on open status.
         status: Value(CommitmentStatus.done),
-        followUpAt: const Value(null),
         updatedAt: Value(DateTime.now()),
       ));
       await _logEvent(id, LoopEventType.done);

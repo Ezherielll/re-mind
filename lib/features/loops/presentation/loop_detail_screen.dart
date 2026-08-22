@@ -147,9 +147,11 @@ class _LoopDetailScreenState extends ConsumerState<LoopDetailScreen> {
                   lastDate: DateTime.now().add(const Duration(days: 730)),
                 );
                 if (picked == null || !mounted) return;
-                await _onSnooze(
-                  picked.difference(DateTime.now()).inDays.abs() + 1,
-                );
+                final now = DateTime.now();
+                final todayStart = DateTime(now.year, now.month, now.day);
+                final days =
+                    picked.difference(todayStart).inDays.clamp(1, 730);
+                await _onSnooze(days);
               },
             ),
           ],
@@ -313,7 +315,7 @@ class _ActionBar extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         child: SizedBox(
           width: double.infinity,
-          child: FilledButton.tonal(
+          child: OutlinedButton(
             onPressed: onReopen,
             child: Text(AppLocalizations.of(context).reopen),
           ),
