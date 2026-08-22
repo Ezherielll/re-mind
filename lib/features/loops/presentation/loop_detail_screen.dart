@@ -6,11 +6,12 @@ import '../../../core/domain/commitment.dart';
 import '../../../l10n/app_localizations.dart';
 import '../data/loops_repository.dart';
 import '../data/providers.dart';
+import '../domain/follow_up_schedule.dart';
 import 'person_screen.dart';
 
 /// Loop detail (page spec: design-system/re-mind/pages/loop-detail.md).
-/// T04 scope: header + meta card with editable dates and person row.
-/// Notes arrive with T10, history with T11, action bar with T06.
+/// T06 adds the pinned action bar (Followed up / Snooze / Done) with the
+/// snooze-cycle rule. Notes arrive with T10, history with T11.
 class LoopDetailScreen extends ConsumerStatefulWidget {
   const LoopDetailScreen({super.key, required this.loopId});
 
@@ -65,6 +66,97 @@ class _LoopDetailScreenState extends ConsumerState<LoopDetailScreen> {
   }
 
   String _fmt(DateTime d) => DateFormat('E, d MMM').format(d);
+
+  Future<void> _onFollowedUp() async {
+    final l10n = AppLocalizations.of(context);
+    final loop = _loop;
+    if (loop == null) return;
+    final next = nextFollowUpAfter(
+      now: DateTime.now(),
+      currentFollowUpAt: loop.commitment.followUpAt,
+      dueDate: loop.commitment.dueDate,
+    );
+    await ref.read(loopsRepositoryProvider).markFollowedUp(
+          widget.loopId,
+          nextNudgeAt: next,
+        );
+    await _reload();
+    if (mounted) {
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(SnackBar(
+          content: Text(l10n.reminderMoved(_fmt(next))),
+        ));
+    }
+  }
+
+  Future<void> _onSnooze(int days) async {
+    await ref
+        .read(loopsRepositoryProvider)
+        .snoozeLoop(widget.loopId, until: snoozeUntil(now: DateTime.now(), days: days));
+    await _reload();
+  }
+
+  Future<void> _onDone() async {
+    final l10n = AppLocalizations.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    final navigator = Navigator.of(context);
+    final repository = ref.read(loopsRepositoryProvider);
+    await repository.markDone(widget.loopId);
+    if (!mounted) return;
+    navigator.pop();
+    messenger.showSnackBar(SnackBar(
+      content: Text(l10n.archivedToast),
+      action: SnackBarAction(
+        label: l10n.undo,
+        onPressed: () => repository.reopenLoop(widget.loopId),
+      ),
+    ));
+  }
+
+  void _showSnoozeSheet() {
+    final l10n = AppLocalizations.of(context);
+    showModalBottomSheet<void>(
+      context: context,
+      builder: (sheetContext) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              title: Text(l10n.snooze1Day),
+              onTap: () {
+                Navigator.pop(sheetContext);
+                _onSnooze(1);
+              },
+            ),
+            ListTile(
+              title: Text(l10n.snooze3Days),
+              onTap: () {
+                Navigator.pop(sheetContext);
+                _onSnooze(3);
+              },
+            ),
+            ListTile(
+              title: Text(l10n.reminderCustom),
+              onTap: () async {
+                Navigator.pop(sheetContext);
+                final picked = await showDatePicker(
+                  context: context,
+                  initialDate: DateTime.now(),
+                  firstDate: DateTime.now(),
+                  lastDate: DateTime.now().add(const Duration(days: 730)),
+                );
+                if (picked == null || !mounted) return;
+                await _onSnooze(
+                  picked.difference(DateTime.now()).inDays.abs() + 1,
+                );
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -157,6 +249,18 @@ class _LoopDetailScreenState extends ConsumerState<LoopDetailScreen> {
                       ],
                     ),
                   ),
+                  _ActionBar(
+                    isArchived: loop.commitment.status == CommitmentStatus.done,
+                    onFollowedUp: _onFollowedUp,
+                    onSnooze: _showSnoozeSheet,
+                    onDone: _onDone,
+                    onReopen: () async {
+                      await ref
+                          .read(loopsRepositoryProvider)
+                          .reopenLoop(widget.loopId);
+                      await _reload();
+                    },
+                  ),
                 ],
               ),
       ),
@@ -184,6 +288,68 @@ class _MetaCard extends StatelessWidget {
     );
   }
 }
+
+/// Pinned action bar (pages/loop-detail.md): Followed up / Snooze / Done.
+/// Archived loops show a single Reopen button instead.
+class _ActionBar extends StatelessWidget {
+  const _ActionBar({
+    required this.isArchived,
+    required this.onFollowedUp,
+    required this.onSnooze,
+    required this.onDone,
+    required this.onReopen,
+  });
+
+  final bool isArchived;
+  final Future<void> Function() onFollowedUp;
+  final VoidCallback onSnooze;
+  final Future<void> Function() onDone;
+  final Future<void> Function() onReopen;
+
+  @override
+  Widget build(BuildContext context) {
+    if (isArchived) {
+      return Padding(
+        padding: const EdgeInsets.all(16),
+        child: SizedBox(
+          width: double.infinity,
+          child: FilledButton.tonal(
+            onPressed: onReopen,
+            child: Text(AppLocalizations.of(context).reopen),
+          ),
+        ),
+      );
+    }
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+      child: Row(
+        children: [
+          Expanded(
+            child: FilledButton.tonal(
+              onPressed: onFollowedUp,
+              child: Text(AppLocalizations.of(context).followedUpLabel),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: OutlinedButton(
+              onPressed: onSnooze,
+              child: Text(AppLocalizations.of(context).snoozeLabel),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: FilledButton(
+              onPressed: onDone,
+              child: Text(AppLocalizations.of(context).doneLabel),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 
 class _MetaRow extends StatelessWidget {
   const _MetaRow({

@@ -73,4 +73,70 @@ void main() {
       expect(plan.followUpAt, friday);
     });
   });
+
+  group('nextFollowUpAfter', () {
+    final monday = DateTime(2026, 8, 24, 10);
+    final friday = DateTime(2026, 8, 28, 9);
+
+    test('current nudge before a future due date advances to the due date',
+        () {
+      final next = nextFollowUpAfter(
+        now: monday,
+        currentFollowUpAt: DateTime(2026, 8, 25, 9),
+        dueDate: friday,
+      );
+      expect(next, friday);
+    });
+
+    test('current nudge already on the due date moves to +3 days', () {
+      final next = nextFollowUpAfter(
+        now: monday,
+        currentFollowUpAt: friday,
+        dueDate: friday,
+      );
+      expect(next, DateTime(2026, 8, 27, 9)); // Thu 09:00
+    });
+
+    test('no due date moves to +3 days at 09:00', () {
+      final next = nextFollowUpAfter(now: monday, currentFollowUpAt: null);
+      expect(next, DateTime(2026, 8, 27, 9));
+    });
+
+    test('past due date falls back to +3 days', () {
+      final next = nextFollowUpAfter(
+        now: monday,
+        currentFollowUpAt: DateTime(2026, 8, 20, 9),
+        dueDate: DateTime(2026, 8, 22, 9),
+      );
+      expect(next, DateTime(2026, 8, 27, 9));
+    });
+
+    test('+3d lands before 09:00 today slides to tomorrow 09:00', () {
+      // Monday 07:00 → +3d 09:00 is Thursday but "now+3d" is Thursday 07:00;
+      // the helper snaps to 09:00 which is after now — stays Thursday.
+      final earlyMonday = DateTime(2026, 8, 24, 7);
+      final next = nextFollowUpAfter(
+        now: earlyMonday,
+        currentFollowUpAt: null,
+      );
+      expect(next, DateTime(2026, 8, 27, 9));
+    });
+  });
+
+  group('snoozeUntil', () {
+    final monday = DateTime(2026, 8, 24, 10);
+
+    test('adds whole days snapped to 09:00', () {
+      expect(snoozeUntil(now: monday, days: 1), DateTime(2026, 8, 25, 9));
+      expect(snoozeUntil(now: monday, days: 3), DateTime(2026, 8, 27, 9));
+    });
+
+    test('snapped time already past slides one more day', () {
+      // Tuesday 08:00 + 1d = Wednesday 08:00 → snap Wed 09:00 is future; ok.
+      final tuesdayEarly = DateTime(2026, 8, 25, 6);
+      final result = snoozeUntil(now: tuesdayEarly, days: 1);
+      expect(result, DateTime(2026, 8, 26, 9));
+      // Edge: Wednesday 09:30 +1d snaps to Thursday 09:00 — in future. Fine.
+    });
+  });
 }

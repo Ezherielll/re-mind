@@ -46,7 +46,28 @@ abstract class LoopsRepository {
   Future<void> updateDates(int id, {DateTime? dueDate, DateTime? followUpAt});
 
   /// One-shot fetch of a loop with its person for the detail screen.
+  ///
+  /// Note: backed by the OPEN query — archived loops resolve to null until
+  /// the detail screen gains an archive-aware fetch (T11).
   Future<LoopWithPerson?> getLoop(int id);
+
+  /// Snooze-cycle action: logs `followedUp` and moves the nudge forward.
+  Future<void> markFollowedUp(int id, {required DateTime nextNudgeAt});
+
+  /// Pushes the next nudge without logging an event.
+  Future<void> snoozeLoop(int id, {required DateTime until});
+
+  /// Closes the loop (auto-archive) and logs `done`.
+  Future<void> markDone(int id);
+
+  /// Un-archives a loop back to open.
+  Future<void> reopenLoop(int id);
+
+  /// Done loops for one person (person view "closed" side).
+  Stream<List<LoopWithPerson>> watchDoneLoopsByPerson(int personId);
+
+  /// All archived (done) loops — history surface.
+  Stream<List<LoopWithPerson>> watchArchivedLoops();
 }
 
 class DriftLoopsRepository implements LoopsRepository {
@@ -177,9 +198,98 @@ class DriftLoopsRepository implements LoopsRepository {
 
   @override
   Future<LoopWithPerson?> getLoop(int id) async {
-    final query = _openLoopsQuery(extraWhere: _db.commitments.id.equals(id));
-    final rows = await query.get();
+    final rows = await _openLoopsQuery(
+      extraWhere: _db.commitments.id.equals(id),
+    ).get();
     if (rows.isEmpty) return null;
     return LoopWithPerson.fromRow(_db, rows.first);
   }
+
+  Future<void> _logEvent(int commitmentId, LoopEventType type) {
+    return _db.into(_db.loopEvents).insert(
+          LoopEventsCompanion.insert(commitmentId: commitmentId, type: type),
+        );
+  }
+
+  @override
+  Future<void> markFollowedUp(int id, {required DateTime nextNudgeAt}) async {
+    await _db.transaction(() async {
+      await (_db.update(_db.commitments)..where((c) => c.id.equals(id)))
+          .write(CommitmentsCompanion(
+        followUpAt: Value(nextNudgeAt),
+        updatedAt: Value(DateTime.now()),
+      ));
+      await _logEvent(id, LoopEventType.followedUp);
+    });
+  }
+
+  @override
+  Future<void> snoozeLoop(int id, {required DateTime until}) {
+    return (_db.update(_db.commitments)..where((c) => c.id.equals(id))).write(
+      CommitmentsCompanion(
+        followUpAt: Value(until),
+        updatedAt: Value(DateTime.now()),
+      ),
+    );
+  }
+
+  @override
+  Future<void> markDone(int id) async {
+    await _db.transaction(() async {
+      await (_db.update(_db.commitments)..where((c) => c.id.equals(id)))
+          .write(CommitmentsCompanion(
+        status: Value(CommitmentStatus.done),
+        followUpAt: const Value(null),
+        updatedAt: Value(DateTime.now()),
+      ));
+      await _logEvent(id, LoopEventType.done);
+    });
+  }
+
+  @override
+  Future<void> reopenLoop(int id) {
+    return (_db.update(_db.commitments)..where((c) => c.id.equals(id))).write(
+      CommitmentsCompanion(
+        status: Value(CommitmentStatus.open),
+        updatedAt: Value(DateTime.now()),
+      ),
+    );
+  }
+
+  Stream<List<LoopWithPerson>> _watchStatus({
+    required bool onlyOpen,
+    Expression<bool>? extraWhere,
+  }) {
+    final query = _db.select(_db.commitments).join([
+      leftOuterJoin(
+        _db.people,
+        _db.people.id.equalsExp(_db.commitments.personId),
+      ),
+    ]);
+    query.where(
+      onlyOpen
+          ? _db.commitments.status.equalsValue(CommitmentStatus.open)
+          : _db.commitments.status.equalsValue(CommitmentStatus.done),
+    );
+    query.where(_db.commitments.deletedAt.isNull());
+    if (extraWhere != null) {
+      query.where(extraWhere);
+    }
+    query.orderBy([OrderingTerm.desc(_db.commitments.id)]);
+    return query.watch().map(
+          (rows) =>
+              rows.map((row) => LoopWithPerson.fromRow(_db, row)).toList(),
+        );
+  }
+
+  @override
+  Stream<List<LoopWithPerson>> watchDoneLoopsByPerson(int personId) =>
+      _watchStatus(
+        onlyOpen: false,
+        extraWhere: _db.commitments.personId.equals(personId),
+      );
+
+  @override
+  Stream<List<LoopWithPerson>> watchArchivedLoops() =>
+      _watchStatus(onlyOpen: false);
 }

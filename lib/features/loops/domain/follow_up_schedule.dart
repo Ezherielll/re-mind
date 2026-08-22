@@ -47,3 +47,27 @@ SchedulePlan computeSchedule({
 
   return (dueDate: dueDate, followUpAt: _plusThreeDays(now));
 }
+
+/// The snooze-cycle rule (CONTEXT.md "Follow-up trigger"): after acting on a
+/// nudge, the next one lands on the due date if it is still ahead, otherwise
+/// three days out at 09:00.
+DateTime nextFollowUpAfter({
+  required DateTime now,
+  DateTime? currentFollowUpAt,
+  DateTime? dueDate,
+}) {
+  if (dueDate != null &&
+      dueDate.isAfter(now) &&
+      (currentFollowUpAt == null || currentFollowUpAt.isBefore(dueDate))) {
+    return _atNine(dueDate);
+  }
+  return _plusThreeDays(now);
+}
+
+/// Snoozes a nudge by whole days, snapped to 09:00; if the snapped time is
+/// not in the future it slides one more day.
+DateTime snoozeUntil({required DateTime now, required int days}) {
+  final candidate = _atNine(now.add(Duration(days: days)));
+  if (candidate.isAfter(now)) return candidate;
+  return candidate.add(const Duration(days: 1));
+}

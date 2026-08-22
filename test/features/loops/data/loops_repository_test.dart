@@ -239,4 +239,70 @@ void main() {
       );
     });
   });
+
+  group('follow-up cycle', () {
+    Future<Commitment> seed({Direction direction = Direction.outgoing}) =>
+        repository.createCommitment(
+          title: 'Send revision',
+          direction: direction,
+        );
+
+    test('markFollowedUp logs event and advances the nudge', () async {
+      final loop = await seed();
+      final next = DateTime(2026, 8, 28, 9);
+
+      await repository.markFollowedUp(loop.id, nextNudgeAt: next);
+
+      final stored = (await repository.getLoop(loop.id))!.commitment;
+      expect(stored.followUpAt, next);
+      final events = await db.select(db.loopEvents).get();
+      expect(events.map((e) => e.type), contains(LoopEventType.followedUp));
+    });
+
+    test('snoozeLoop moves only followUpAt and logs nothing', () async {
+      final loop = await seed();
+      final until = DateTime(2026, 8, 30, 9);
+
+      await repository.snoozeLoop(loop.id, until: until);
+
+      final stored = (await repository.getLoop(loop.id))!.commitment;
+      expect(stored.followUpAt, until);
+      final events = await db.select(db.loopEvents).get();
+      expect(events, hasLength(1)); // only 'created'
+    });
+
+    test('markDone archives out of open queries into done queries', () async {
+      final person = await repository.findOrCreatePerson('Budi');
+      final loop =
+          await seed();
+      // Link person post-hoc for the by-person assertions.
+      await (db.update(db.commitments)..where((c) => c.id.equals(loop.id)))
+          .write(CommitmentsCompanion(personId: Value(person.id)));
+
+      await repository.markDone(loop.id);
+
+      expect(await repository.watchOpenLoops().first, isEmpty);
+      expect(
+        await repository.watchOpenLoopsByPerson(person.id).first,
+        isEmpty,
+      );
+      final doneForPerson =
+          await repository.watchDoneLoopsByPerson(person.id).first;
+      expect(doneForPerson.single.commitment.id, loop.id);
+      final archived = await repository.watchArchivedLoops().first;
+      expect(archived.single.commitment.id, loop.id);
+      final events = await db.select(db.loopEvents).get();
+      expect(events.map((e) => e.type), contains(LoopEventType.done));
+    });
+
+    test('reopenLoop restores an archived loop to open', () async {
+      final loop = await seed();
+      await repository.markDone(loop.id);
+
+      await repository.reopenLoop(loop.id);
+
+      final open = await repository.watchOpenLoops().first;
+      expect(open.single.commitment.id, loop.id);
+    });
+  });
 }

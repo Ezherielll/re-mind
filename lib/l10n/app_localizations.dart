@@ -279,6 +279,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'· {count}'**
   String groupCount(Object count);
+
+  /// No description provided for @followedUpLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Followed up'**
+  String get followedUpLabel;
+
+  /// No description provided for @snoozeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Snooze'**
+  String get snoozeLabel;
+
+  /// No description provided for @doneLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get doneLabel;
+
+  /// No description provided for @snooze1Day.
+  ///
+  /// In en, this message translates to:
+  /// **'1 day'**
+  String get snooze1Day;
+
+  /// No description provided for @snooze3Days.
+  ///
+  /// In en, this message translates to:
+  /// **'3 days'**
+  String get snooze3Days;
+
+  /// No description provided for @reminderMoved.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminder moved to {when}'**
+  String reminderMoved(Object when);
+
+  /// No description provided for @archivedToast.
+  ///
+  /// In en, this message translates to:
+  /// **'Archived'**
+  String get archivedToast;
+
+  /// No description provided for @undo.
+  ///
+  /// In en, this message translates to:
+  /// **'Undo'**
+  String get undo;
+
+  /// No description provided for @reopen.
+  ///
+  /// In en, this message translates to:
+  /// **'Reopen'**
+  String get reopen;
 }
 
 class _AppLocalizationsDelegate

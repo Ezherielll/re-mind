@@ -108,4 +108,33 @@ class AppLocalizationsEn extends AppLocalizations {
   String groupCount(Object count) {
     return '· $count';
   }
+
+  @override
+  String get followedUpLabel => 'Followed up';
+
+  @override
+  String get snoozeLabel => 'Snooze';
+
+  @override
+  String get doneLabel => 'Done';
+
+  @override
+  String get snooze1Day => '1 day';
+
+  @override
+  String get snooze3Days => '3 days';
+
+  @override
+  String reminderMoved(Object when) {
+    return 'Reminder moved to $when';
+  }
+
+  @override
+  String get archivedToast => 'Archived';
+
+  @override
+  String get undo => 'Undo';
+
+  @override
+  String get reopen => 'Reopen';
 }
