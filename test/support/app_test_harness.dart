@@ -37,6 +37,9 @@ Future<void> settleRealAsync(WidgetTester tester) async {
     () => Future<void>.delayed(const Duration(milliseconds: 100)),
   );
   await tester.pumpAndSettle();
+  // Burn fake time past snackbars/pickers' auto-dismiss windows so no
+  // FakeAsync timer outlives the test (flutter_tester shutdown hang).
+  await tester.pump(const Duration(seconds: 6));
 }
 
 /// Unmounts the tree and flushes the zero-duration timer Drift schedules
