@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/db/app_database.dart';
 import '../../../core/domain/commitment.dart';
 import '../../../core/domain/digest.dart';
 import '../../../core/domain/derived_status.dart';
@@ -14,7 +15,13 @@ import 'capture_sheet.dart';
 import 'home_groups.dart';
 import 'loop_detail_screen.dart';
 import 'person_screen.dart';
+import 'search_screen.dart';
 import 'widgets/loop_row.dart';
+
+/// Sample loops still present (T09 banner).
+final samplesProvider = FutureProvider<List<Commitment>>(
+  (ref) => ref.watch(loopsRepositoryProvider).sampleLoops(),
+);
 
 /// Active direction filter on the home list (null = All).
 class DirectionFilter extends Notifier<Direction?> {
@@ -101,6 +108,14 @@ class HomeScreen extends ConsumerWidget {
                   ],
                   const Spacer(),
                   IconButton(
+                    tooltip: l10n.searchHint,
+                    onPressed: () => Navigator.of(context).push(
+                      MaterialPageRoute<void>(
+                          builder: (_) => const SearchScreen()),
+                    ),
+                    icon: const Icon(Icons.search),
+                  ),
+                  IconButton(
                     tooltip: l10n.settingsTitle,
                     onPressed: () => Navigator.of(context).push(
                       MaterialPageRoute<void>(
@@ -140,7 +155,20 @@ class HomeScreen extends ConsumerWidget {
                         if (groups.isEmpty) {
                           return const _EmptyState();
                         }
-                        return _GroupedList(groups);
+                        return _GroupedList(
+                      groups,
+                      sampleIds: ref.watch(samplesProvider).value
+                              ?.map((c) => c.id)
+                              .toSet() ??
+                          const <int>{},
+                      onRemoveSamples: () async {
+                        await ref
+                            .read(loopsRepositoryProvider)
+                            .removeAllSamples();
+                        ref.invalidate(samplesProvider);
+                        ref.invalidate(openLoopsProvider);
+                      },
+                    );
                       },
                     ),
                   ),
@@ -235,13 +263,25 @@ class _EmptyState extends StatelessWidget {
 }
 
 class _GroupedList extends StatelessWidget {
-  const _GroupedList(this.groups);
+  const _GroupedList(
+    this.groups, {
+    required this.sampleIds,
+    required this.onRemoveSamples,
+  });
 
   final List<LoopGroup> groups;
+  final Set<int> sampleIds;
+  final Future<void> Function() onRemoveSamples;
 
   @override
   Widget build(BuildContext context) {
     final children = <Widget>[];
+    if (sampleIds.isNotEmpty) {
+      children.add(_SampleBanner(onRemove: onRemoveSamples));
+    }
+    if (sampleIds.isNotEmpty) {
+      children.add(_SampleBanner(onRemove: onRemoveSamples));
+    }
     for (final group in groups) {
       children.add(
         _GroupHeader(status: group.status, count: group.loops.length),
@@ -251,6 +291,7 @@ class _GroupedList extends StatelessWidget {
           LoopRow(
             item: item,
             status: group.status,
+            isSample: sampleIds.contains(item.commitment.id),
             onTap: () => Navigator.of(context).push(
               MaterialPageRoute<void>(
                 builder: (_) => LoopDetailScreen(loopId: item.commitment.id),
@@ -310,6 +351,31 @@ class _GroupHeader extends StatelessWidget {
               color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
           ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SampleBanner extends StatelessWidget {
+  const _SampleBanner({required this.onRemove});
+
+  final Future<void> Function() onRemove;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Container(
+      margin: const EdgeInsets.only(top: 8, bottom: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.10),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        children: [
+          Expanded(child: Text(l10n.samplesBanner, style: Theme.of(context).textTheme.bodySmall)),
+          TextButton(onPressed: onRemove, child: Text(l10n.removeSamples)),
         ],
       ),
     );

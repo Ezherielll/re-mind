@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -23,6 +25,8 @@ class LoopDetailScreen extends ConsumerStatefulWidget {
 
 class _LoopDetailScreenState extends ConsumerState<LoopDetailScreen> {
   LoopWithPerson? _loop;
+  TextEditingController? _noteController;
+  Timer? _noteDebounce;
 
   @override
   void initState() {
@@ -30,9 +34,30 @@ class _LoopDetailScreenState extends ConsumerState<LoopDetailScreen> {
     _reload();
   }
 
+  @override
+  void dispose() {
+    _noteDebounce?.cancel();
+    _noteController?.dispose();
+    super.dispose();
+  }
+
   Future<void> _reload() async {
     final loop = await ref.read(loopsRepositoryProvider).getLoop(widget.loopId);
-    if (mounted) setState(() => _loop = loop);
+    if (mounted) {
+      setState(() {
+        _loop = loop;
+        if (_noteController == null && loop != null) {
+          _noteController = TextEditingController(text: loop.commitment.note);
+        }
+      });
+    }
+  }
+
+  void _onNoteChanged(String value) {
+    _noteDebounce?.cancel();
+    _noteDebounce = Timer(const Duration(milliseconds: 500), () {
+      ref.read(loopsRepositoryProvider).updateNote(widget.loopId, value);
+    });
   }
 
   Future<void> _pickDate({required bool isDue}) async {
@@ -247,6 +272,29 @@ class _LoopDetailScreenState extends ConsumerState<LoopDetailScreen> {
                               ),
                             ],
                           ],
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          l10n.notesLabel.toUpperCase(),
+                          style:
+                              Theme.of(context).textTheme.labelMedium?.copyWith(
+                                fontWeight: FontWeight.w600,
+                                letterSpacing: 0.05,
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onSurfaceVariant,
+                              ),
+                        ),
+                        const SizedBox(height: 4),
+                        TextField(
+                          controller: _noteController,
+                          onChanged: _onNoteChanged,
+                          minLines: 2,
+                          maxLines: 5,
+                          decoration: InputDecoration(
+                            border: const OutlineInputBorder(),
+                            hintText: l10n.noteHint,
+                          ),
                         ),
                       ],
                     ),

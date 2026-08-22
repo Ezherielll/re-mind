@@ -8,6 +8,7 @@ import 'package:timezone/timezone.dart' as tz;
 
 import 'core/notifications/real_reminder_scheduler.dart';
 import 'features/loops/data/reminder_coordinator.dart';
+import 'features/loops/data/sample_seed.dart';
 import 'core/db/app_database.dart';
 import 'core/theme/app_theme.dart';
 import 'features/loops/presentation/home_screen.dart';
@@ -18,6 +19,9 @@ Future<void> main() async {
   tzdata.initializeTimeZones();
   final localName = await FlutterTimezone.getLocalTimezone();
   tz.setLocalLocation(tz.getLocation(localName.identifier));
+  final bootstrapDb = AppDatabase();
+  await seedSampleLoopsOnce(bootstrapDb);
+  await bootstrapDb.close();
   final scheduler = await RealReminderScheduler.create();
   shadeDbPath = await AppDatabase.filePath();
   runApp(

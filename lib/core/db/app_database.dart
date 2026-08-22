@@ -57,6 +57,10 @@ class Commitments extends Table {
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
   DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
   DateTimeColumn get deletedAt => dateTime().nullable()();
+  TextColumn get note => text().nullable()();
+
+  /// First-run sample loops (T09): flagged so home can offer one-tap removal.
+  BoolColumn get sample => boolean().withDefault(const Constant(false))();
 }
 
 /// Append-only history of state transitions (created / followed up / done).

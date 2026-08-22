@@ -519,6 +519,28 @@ class $CommitmentsTable extends Commitments
     type: DriftSqlType.dateTime,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _noteMeta = const VerificationMeta('note');
+  @override
+  late final GeneratedColumn<String> note = GeneratedColumn<String>(
+    'note',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _sampleMeta = const VerificationMeta('sample');
+  @override
+  late final GeneratedColumn<bool> sample = GeneratedColumn<bool>(
+    'sample',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("sample" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -531,6 +553,8 @@ class $CommitmentsTable extends Commitments
     createdAt,
     updatedAt,
     deletedAt,
+    note,
+    sample,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -594,6 +618,18 @@ class $CommitmentsTable extends Commitments
         deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta),
       );
     }
+    if (data.containsKey('note')) {
+      context.handle(
+        _noteMeta,
+        note.isAcceptableOrUnknown(data['note']!, _noteMeta),
+      );
+    }
+    if (data.containsKey('sample')) {
+      context.handle(
+        _sampleMeta,
+        sample.isAcceptableOrUnknown(data['sample']!, _sampleMeta),
+      );
+    }
     return context;
   }
 
@@ -647,6 +683,14 @@ class $CommitmentsTable extends Commitments
         DriftSqlType.dateTime,
         data['${effectivePrefix}deleted_at'],
       ),
+      note: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}note'],
+      ),
+      sample: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}sample'],
+      )!,
     );
   }
 
@@ -672,6 +716,10 @@ class Commitment extends DataClass implements Insertable<Commitment> {
   final DateTime createdAt;
   final DateTime updatedAt;
   final DateTime? deletedAt;
+  final String? note;
+
+  /// First-run sample loops (T09): flagged so home can offer one-tap removal.
+  final bool sample;
   const Commitment({
     required this.id,
     required this.title,
@@ -683,6 +731,8 @@ class Commitment extends DataClass implements Insertable<Commitment> {
     required this.createdAt,
     required this.updatedAt,
     this.deletedAt,
+    this.note,
+    required this.sample,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -713,6 +763,10 @@ class Commitment extends DataClass implements Insertable<Commitment> {
     if (!nullToAbsent || deletedAt != null) {
       map['deleted_at'] = Variable<DateTime>(deletedAt);
     }
+    if (!nullToAbsent || note != null) {
+      map['note'] = Variable<String>(note);
+    }
+    map['sample'] = Variable<bool>(sample);
     return map;
   }
 
@@ -736,6 +790,8 @@ class Commitment extends DataClass implements Insertable<Commitment> {
       deletedAt: deletedAt == null && nullToAbsent
           ? const Value.absent()
           : Value(deletedAt),
+      note: note == null && nullToAbsent ? const Value.absent() : Value(note),
+      sample: Value(sample),
     );
   }
 
@@ -759,6 +815,8 @@ class Commitment extends DataClass implements Insertable<Commitment> {
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
       deletedAt: serializer.fromJson<DateTime?>(json['deletedAt']),
+      note: serializer.fromJson<String?>(json['note']),
+      sample: serializer.fromJson<bool>(json['sample']),
     );
   }
   @override
@@ -779,6 +837,8 @@ class Commitment extends DataClass implements Insertable<Commitment> {
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
       'deletedAt': serializer.toJson<DateTime?>(deletedAt),
+      'note': serializer.toJson<String?>(note),
+      'sample': serializer.toJson<bool>(sample),
     };
   }
 
@@ -793,6 +853,8 @@ class Commitment extends DataClass implements Insertable<Commitment> {
     DateTime? createdAt,
     DateTime? updatedAt,
     Value<DateTime?> deletedAt = const Value.absent(),
+    Value<String?> note = const Value.absent(),
+    bool? sample,
   }) => Commitment(
     id: id ?? this.id,
     title: title ?? this.title,
@@ -804,6 +866,8 @@ class Commitment extends DataClass implements Insertable<Commitment> {
     createdAt: createdAt ?? this.createdAt,
     updatedAt: updatedAt ?? this.updatedAt,
     deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
+    note: note.present ? note.value : this.note,
+    sample: sample ?? this.sample,
   );
   Commitment copyWithCompanion(CommitmentsCompanion data) {
     return Commitment(
@@ -819,6 +883,8 @@ class Commitment extends DataClass implements Insertable<Commitment> {
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
       deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
+      note: data.note.present ? data.note.value : this.note,
+      sample: data.sample.present ? data.sample.value : this.sample,
     );
   }
 
@@ -834,7 +900,9 @@ class Commitment extends DataClass implements Insertable<Commitment> {
           ..write('followUpAt: $followUpAt, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
-          ..write('deletedAt: $deletedAt')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('note: $note, ')
+          ..write('sample: $sample')
           ..write(')'))
         .toString();
   }
@@ -851,6 +919,8 @@ class Commitment extends DataClass implements Insertable<Commitment> {
     createdAt,
     updatedAt,
     deletedAt,
+    note,
+    sample,
   );
   @override
   bool operator ==(Object other) =>
@@ -865,7 +935,9 @@ class Commitment extends DataClass implements Insertable<Commitment> {
           other.followUpAt == this.followUpAt &&
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt &&
-          other.deletedAt == this.deletedAt);
+          other.deletedAt == this.deletedAt &&
+          other.note == this.note &&
+          other.sample == this.sample);
 }
 
 class CommitmentsCompanion extends UpdateCompanion<Commitment> {
@@ -879,6 +951,8 @@ class CommitmentsCompanion extends UpdateCompanion<Commitment> {
   final Value<DateTime> createdAt;
   final Value<DateTime> updatedAt;
   final Value<DateTime?> deletedAt;
+  final Value<String?> note;
+  final Value<bool> sample;
   const CommitmentsCompanion({
     this.id = const Value.absent(),
     this.title = const Value.absent(),
@@ -890,6 +964,8 @@ class CommitmentsCompanion extends UpdateCompanion<Commitment> {
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.deletedAt = const Value.absent(),
+    this.note = const Value.absent(),
+    this.sample = const Value.absent(),
   });
   CommitmentsCompanion.insert({
     this.id = const Value.absent(),
@@ -902,6 +978,8 @@ class CommitmentsCompanion extends UpdateCompanion<Commitment> {
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.deletedAt = const Value.absent(),
+    this.note = const Value.absent(),
+    this.sample = const Value.absent(),
   }) : title = Value(title),
        direction = Value(direction),
        status = Value(status);
@@ -916,6 +994,8 @@ class CommitmentsCompanion extends UpdateCompanion<Commitment> {
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
     Expression<DateTime>? deletedAt,
+    Expression<String>? note,
+    Expression<bool>? sample,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -928,6 +1008,8 @@ class CommitmentsCompanion extends UpdateCompanion<Commitment> {
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
       if (deletedAt != null) 'deleted_at': deletedAt,
+      if (note != null) 'note': note,
+      if (sample != null) 'sample': sample,
     });
   }
 
@@ -942,6 +1024,8 @@ class CommitmentsCompanion extends UpdateCompanion<Commitment> {
     Value<DateTime>? createdAt,
     Value<DateTime>? updatedAt,
     Value<DateTime?>? deletedAt,
+    Value<String?>? note,
+    Value<bool>? sample,
   }) {
     return CommitmentsCompanion(
       id: id ?? this.id,
@@ -954,6 +1038,8 @@ class CommitmentsCompanion extends UpdateCompanion<Commitment> {
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       deletedAt: deletedAt ?? this.deletedAt,
+      note: note ?? this.note,
+      sample: sample ?? this.sample,
     );
   }
 
@@ -994,6 +1080,12 @@ class CommitmentsCompanion extends UpdateCompanion<Commitment> {
     if (deletedAt.present) {
       map['deleted_at'] = Variable<DateTime>(deletedAt.value);
     }
+    if (note.present) {
+      map['note'] = Variable<String>(note.value);
+    }
+    if (sample.present) {
+      map['sample'] = Variable<bool>(sample.value);
+    }
     return map;
   }
 
@@ -1009,7 +1101,9 @@ class CommitmentsCompanion extends UpdateCompanion<Commitment> {
           ..write('followUpAt: $followUpAt, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
-          ..write('deletedAt: $deletedAt')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('note: $note, ')
+          ..write('sample: $sample')
           ..write(')'))
         .toString();
   }
@@ -1876,6 +1970,8 @@ typedef $$CommitmentsTableCreateCompanionBuilder =
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
       Value<DateTime?> deletedAt,
+      Value<String?> note,
+      Value<bool> sample,
     });
 typedef $$CommitmentsTableUpdateCompanionBuilder =
     CommitmentsCompanion Function({
@@ -1889,6 +1985,8 @@ typedef $$CommitmentsTableUpdateCompanionBuilder =
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
       Value<DateTime?> deletedAt,
+      Value<String?> note,
+      Value<bool> sample,
     });
 
 final class $$CommitmentsTableReferences
@@ -1984,6 +2082,16 @@ class $$CommitmentsTableFilterComposer
 
   ColumnFilters<DateTime> get deletedAt => $composableBuilder(
     column: $table.deletedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get note => $composableBuilder(
+    column: $table.note,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get sample => $composableBuilder(
+    column: $table.sample,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -2090,6 +2198,16 @@ class $$CommitmentsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get note => $composableBuilder(
+    column: $table.note,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get sample => $composableBuilder(
+    column: $table.sample,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   $$PeopleTableOrderingComposer get personId {
     final $$PeopleTableOrderingComposer composer = $composerBuilder(
       composer: this,
@@ -2151,6 +2269,12 @@ class $$CommitmentsTableAnnotationComposer
 
   GeneratedColumn<DateTime> get deletedAt =>
       $composableBuilder(column: $table.deletedAt, builder: (column) => column);
+
+  GeneratedColumn<String> get note =>
+      $composableBuilder(column: $table.note, builder: (column) => column);
+
+  GeneratedColumn<bool> get sample =>
+      $composableBuilder(column: $table.sample, builder: (column) => column);
 
   $$PeopleTableAnnotationComposer get personId {
     final $$PeopleTableAnnotationComposer composer = $composerBuilder(
@@ -2239,6 +2363,8 @@ class $$CommitmentsTableTableManager
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
                 Value<DateTime?> deletedAt = const Value.absent(),
+                Value<String?> note = const Value.absent(),
+                Value<bool> sample = const Value.absent(),
               }) => CommitmentsCompanion(
                 id: id,
                 title: title,
@@ -2250,6 +2376,8 @@ class $$CommitmentsTableTableManager
                 createdAt: createdAt,
                 updatedAt: updatedAt,
                 deletedAt: deletedAt,
+                note: note,
+                sample: sample,
               ),
           createCompanionCallback:
               ({
@@ -2263,6 +2391,8 @@ class $$CommitmentsTableTableManager
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
                 Value<DateTime?> deletedAt = const Value.absent(),
+                Value<String?> note = const Value.absent(),
+                Value<bool> sample = const Value.absent(),
               }) => CommitmentsCompanion.insert(
                 id: id,
                 title: title,
@@ -2274,6 +2404,8 @@ class $$CommitmentsTableTableManager
                 createdAt: createdAt,
                 updatedAt: updatedAt,
                 deletedAt: deletedAt,
+                note: note,
+                sample: sample,
               ),
           withReferenceMapper: (p0) => p0
               .map(

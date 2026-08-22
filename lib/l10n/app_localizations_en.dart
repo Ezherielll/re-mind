@@ -156,4 +156,31 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsTitle => 'Settings';
+
+  @override
+  String get samplesBanner => 'These are examples — remove them';
+
+  @override
+  String get removeSamples => 'Remove';
+
+  @override
+  String get sampleTag => 'Sample';
+
+  @override
+  String get notesLabel => 'Notes';
+
+  @override
+  String get noteHint => 'Add a note…';
+
+  @override
+  String get searchHint => 'Search commitments and people';
+
+  @override
+  String get searchPeople => 'People';
+
+  @override
+  String get searchLoopsLabel => 'Loops';
+
+  @override
+  String get noMatches => 'No matches';
 }

@@ -13,12 +13,14 @@ class LoopRow extends StatelessWidget {
     super.key,
     required this.item,
     required this.status,
+    this.isSample = false,
     this.onTap,
     this.onTapPerson,
   });
 
   final LoopWithPerson item;
   final DerivedStatus status;
+  final bool isSample;
   final VoidCallback? onTap;
   final void Function(Person person)? onTapPerson;
 
@@ -41,30 +43,53 @@ class LoopRow extends StatelessWidget {
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
       ),
-      subtitle: person == null
-          ? null
-          : InkWell(
-              onTap: onTapPerson == null ? null : () => onTapPerson!(person),
-              borderRadius: BorderRadius.circular(8),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 4),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(Icons.person_outline, size: 14),
-                    const SizedBox(width: 4),
-                    Flexible(
-                      child: Text(
-                        person.name,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: Theme.of(context).textTheme.bodySmall,
+      subtitle: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (isSample)
+            Container(
+              margin: const EdgeInsets.only(right: 6),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+              decoration: BoxDecoration(
+                color: Theme.of(context)
+                    .colorScheme
+                    .onSurfaceVariant
+                    .withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: Text(
+                'Sample',
+                style: Theme.of(context).textTheme.labelSmall,
+              ),
+            ),
+          if (person != null)
+            Flexible(
+              child: InkWell(
+                onTap: onTapPerson == null ? null : () => onTapPerson!(person),
+                borderRadius: BorderRadius.circular(8),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 4),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.person_outline, size: 14),
+                      const SizedBox(width: 4),
+                      Flexible(
+                        child: Text(
+                          person.name,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
+        ],
+      ),
       trailing: Container(
         width: 10,
         height: 10,

@@ -20,6 +20,8 @@ LoopWithPerson _loop({
     followUpAt: followUpAt,
     createdAt: DateTime(2026, 8, 20),
     updatedAt: DateTime(2026, 8, 20),
+    note: null,
+    sample: false,
   ),
   null,
 );

@@ -3,9 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import '../../../core/db/app_database.dart';
+import '../../../core/db/providers.dart';
 import '../../../core/domain/commitment.dart';
 import '../../../l10n/app_localizations.dart';
 import '../data/providers.dart';
+import '../data/reminder_coordinator.dart';
 import '../domain/follow_up_schedule.dart';
 
 /// Capture flow (page spec: design-system/re-mind/pages/capture.md).
@@ -124,6 +126,14 @@ class _CaptureSheetState extends ConsumerState<CaptureSheet> {
       dueDate: plan.dueDate,
       followUpAt: plan.followUpAt,
     );
+    // Ask for notification permission right after the first real save.
+    final db = ref.read(databaseProvider);
+    if (await db.getSetting('perm_asked') == null) {
+      await db.setSetting('perm_asked', '1');
+      try {
+        await ref.read(reminderSchedulerProvider).requestPermission();
+      } catch (_) {}
+    }
     if (!mounted) return;
     Navigator.of(context).pop();
     messenger.showSnackBar(SnackBar(content: Text(l10n.saved)));

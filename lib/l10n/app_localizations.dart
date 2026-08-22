@@ -363,6 +363,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Settings'**
   String get settingsTitle;
+
+  /// No description provided for @samplesBanner.
+  ///
+  /// In en, this message translates to:
+  /// **'These are examples — remove them'**
+  String get samplesBanner;
+
+  /// No description provided for @removeSamples.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove'**
+  String get removeSamples;
+
+  /// No description provided for @sampleTag.
+  ///
+  /// In en, this message translates to:
+  /// **'Sample'**
+  String get sampleTag;
+
+  /// No description provided for @notesLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Notes'**
+  String get notesLabel;
+
+  /// No description provided for @noteHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a note…'**
+  String get noteHint;
+
+  /// No description provided for @searchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search commitments and people'**
+  String get searchHint;
+
+  /// No description provided for @searchPeople.
+  ///
+  /// In en, this message translates to:
+  /// **'People'**
+  String get searchPeople;
+
+  /// No description provided for @searchLoopsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Loops'**
+  String get searchLoopsLabel;
+
+  /// No description provided for @noMatches.
+  ///
+  /// In en, this message translates to:
+  /// **'No matches'**
+  String get noMatches;
 }
 
 class _AppLocalizationsDelegate

@@ -44,5 +44,14 @@
   "digestNone": "All clear — nothing hanging.",
   "digestHanging": "{count} things hanging",
   "digestChase": ", {count} to chase today",
-  "settingsTitle": "Settings"
+  "settingsTitle": "Settings",
+  "samplesBanner": "These are examples — remove them",
+  "removeSamples": "Remove",
+  "sampleTag": "Sample",
+  "notesLabel": "Notes",
+  "noteHint": "Add a note…",
+  "searchHint": "Search commitments and people",
+  "searchPeople": "People",
+  "searchLoopsLabel": "Loops",
+  "noMatches": "No matches"
 }

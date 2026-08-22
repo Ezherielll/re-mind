@@ -68,7 +68,21 @@ abstract class LoopsRepository {
 
   /// All archived (done) loops — history surface.
   Stream<List<LoopWithPerson>> watchArchivedLoops();
+
+  /// Saves the detail-screen note (T10); bumps updatedAt.
+  Future<void> updateNote(int id, String? note);
+
+  /// Live search over commitment titles/notes and person names (T10);
+  /// soft-deleted excluded.
+  Future<List<LoopWithPerson>> searchLoops(String query, {int limit});
+
+  /// Sample loops currently present (ids + titles) for the T09 banner.
+  Future<List<Commitment>> sampleLoops();
+
+  /// Soft-deletes every remaining sample loop (one-tap clear).
+  Future<void> removeAllSamples();
 }
+
 
 class DriftLoopsRepository implements LoopsRepository {
   DriftLoopsRepository(this._db);
@@ -294,4 +308,51 @@ class DriftLoopsRepository implements LoopsRepository {
   @override
   Stream<List<LoopWithPerson>> watchArchivedLoops() =>
       _watchStatus(onlyOpen: false);
+
+  @override
+  Future<void> updateNote(int id, String? note) {
+    return (_db.update(_db.commitments)..where((c) => c.id.equals(id))).write(
+      CommitmentsCompanion(note: Value(note), updatedAt: Value(DateTime.now())),
+    );
+  }
+
+  @override
+  Future<List<LoopWithPerson>> searchLoops(String query, {int limit = 50}) async {
+    final q = query.trim();
+    if (q.isEmpty) return const [];
+    final like = '%${DriftLoopsRepository._normalize(q)}%';
+    final query_ = _db.select(_db.commitments).join([
+      leftOuterJoin(
+        _db.people,
+        _db.people.id.equalsExp(_db.commitments.personId),
+      ),
+    ])
+      ..where(_db.commitments.deletedAt.isNull())
+      ..limit(limit);
+    // Title/note match OR person-name match:
+    final titleLike = _db.commitments.title.lower().like(like);
+    final noteLike = _db.commitments.note.lower().like(like);
+    final personLike = _db.people.normalizedName.like(like);
+    query_.where(titleLike | noteLike | personLike);
+    final rows = await query_.get();
+    return rows.map((row) => LoopWithPerson.fromRow(_db, row)).toList();
+  }
+
+  @override
+  Future<List<Commitment>> sampleLoops() {
+    return (_db.select(_db.commitments)
+          ..where((c) => c.sample.equals(true))
+          ..where((c) => c.deletedAt.isNull()))
+        .get();
+  }
+
+  @override
+  Future<void> removeAllSamples() {
+    return (_db.update(_db.commitments)
+          ..where((c) => c.sample.equals(true)))
+        .write(CommitmentsCompanion(
+      deletedAt: Value(DateTime.now()),
+      updatedAt: Value(DateTime.now()),
+    ));
+  }
 }
