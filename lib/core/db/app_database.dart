@@ -5,14 +5,16 @@ import 'package:drift/native.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
+import '../../features/loops/domain/commitment.dart';
+
 part 'app_database.g.dart';
 
 /// Local-first persistence (ADR-0001).
 ///
-/// Schema v1 is intentionally empty: tables arrive with the features that own
-/// them (T02 adds commitments + event log). Every mutable table added later
-/// must carry `updatedAt`/`deletedAt` columns.
-@DriftDatabase(tables: [])
+/// Every mutable table carries `updatedAt`/`deletedAt` (soft delete) so a
+/// future sync engine has the metadata it needs. The event log records every
+/// state transition from day one.
+@DriftDatabase(tables: [Commitments, LoopEvents])
 class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? executor]) : super(executor ?? _openConnection());
 
@@ -24,4 +26,29 @@ class AppDatabase extends _$AppDatabase {
         final file = File(p.join(dir.path, 're_mind.sqlite'));
         return NativeDatabase.createInBackground(file);
       });
+}
+
+/// One hanging commitment between the user and another person.
+///
+/// Stored state is deliberately minimal (CONTEXT.md): direction, status,
+/// optional dates. Everything shown in the UI beyond this is derived.
+class Commitments extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  TextColumn get title => text()();
+  TextColumn get direction => textEnum<Direction>()();
+  TextColumn get status => textEnum<CommitmentStatus>()();
+  DateTimeColumn get dueDate => dateTime().nullable()();
+  DateTimeColumn get followUpAt => dateTime().nullable()();
+  DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
+  DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
+  DateTimeColumn get deletedAt => dateTime().nullable()();
+}
+
+/// Append-only history of state transitions (created / followed up / done).
+class LoopEvents extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  IntColumn get commitmentId =>
+      integer().references(Commitments, #id)();
+  TextColumn get type => textEnum<LoopEventType>()();
+  DateTimeColumn get occurredAt => dateTime().withDefault(currentDateAndTime)();
 }

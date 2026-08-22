@@ -22,4 +22,19 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get homeCaptureLabel => 'Capture';
+
+  @override
+  String get captureHint => 'What\'s hanging?';
+
+  @override
+  String get directionOutgoing => 'I owe';
+
+  @override
+  String get directionIncoming => 'Waiting for';
+
+  @override
+  String get save => 'Save';
+
+  @override
+  String get saved => 'Saved';
 }

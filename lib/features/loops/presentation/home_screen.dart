@@ -1,24 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/db/app_database.dart';
 import '../../../l10n/app_localizations.dart';
+import '../data/providers.dart';
+import '../domain/commitment.dart';
+import 'capture_sheet.dart';
 
 /// Home screen: the single prioritized open-loop list (page spec:
-/// design-system/re-mind/pages/home.md). T01 delivers the themed shell with
-/// the empty state; grouping and rows arrive with T02+.
-class HomeScreen extends StatelessWidget {
+/// design-system/re-mind/pages/home.md). Grouping by derived status arrives
+/// with T05; rows are flat until then.
+class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
-    final display = TextStyle(
-      inherit: false,
-      fontFamily: Theme.of(context).textTheme.bodyLarge?.fontFamily,
-      fontSize: 28,
-      fontWeight: FontWeight.w700,
-      letterSpacing: -0.02,
-      color: Theme.of(context).colorScheme.onSurface,
-    );
+    final loops = ref.watch(openLoopsProvider);
     return Scaffold(
       body: SafeArea(
         child: Padding(
@@ -27,25 +25,20 @@ class HomeScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 24),
-              Text(l10n.homeTitle, style: display),
+              Text(
+                l10n.homeTitle,
+                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: -0.02,
+                    ),
+              ),
               Expanded(
-                child: Center(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text('0', style: display.copyWith(fontSize: 64)),
-                      const SizedBox(height: 8),
-                      Text(
-                        l10n.homeEmptyTitle,
-                        style: Theme.of(context).textTheme.titleMedium,
-                      ),
-                      const SizedBox(height: 16),
-                      TextButton(
-                        onPressed: () {},
-                        child: Text(l10n.homeEmptyCta),
-                      ),
-                    ],
-                  ),
+                child: loops.when(
+                  loading: () => const SizedBox.shrink(),
+                  error: (_, _) => const SizedBox.shrink(),
+                  data: (items) => items.isEmpty
+                      ? _EmptyState()
+                      : _LoopList(items),
                 ),
               ),
             ],
@@ -53,10 +46,61 @@ class HomeScreen extends StatelessWidget {
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {},
+        onPressed: () => CaptureSheet.show(context),
         icon: const Icon(Icons.add),
         label: Text(l10n.homeCaptureLabel),
       ),
+    );
+  }
+}
+
+class _EmptyState extends StatelessWidget {
+  const _EmptyState();
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final display = Theme.of(context).textTheme.headlineMedium;
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text('0', style: display?.copyWith(fontSize: 64)),
+          const SizedBox(height: 8),
+          Text(l10n.homeEmptyTitle, style: Theme.of(context).textTheme.titleMedium),
+          const SizedBox(height: 16),
+          TextButton(onPressed: () {}, child: Text(l10n.homeEmptyCta)),
+        ],
+      ),
+    );
+  }
+}
+
+class _LoopList extends StatelessWidget {
+  const _LoopList(this.items);
+
+  final List<Commitment> items;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.separated(
+      padding: const EdgeInsets.only(top: 8, bottom: 96),
+      itemCount: items.length,
+      separatorBuilder: (_, _) => const Divider(height: 1),
+      itemBuilder: (context, index) {
+        final loop = items[index];
+        return ListTile(
+          key: ValueKey(loop.id),
+          contentPadding: EdgeInsets.zero,
+          minVerticalPadding: 12,
+          leading: Icon(
+            loop.direction == Direction.outgoing
+                ? Icons.north_east
+                : Icons.south_west,
+          ),
+          title: Text(loop.title, maxLines: 1, overflow: TextOverflow.ellipsis),
+        );
+      },
     );
   }
 }

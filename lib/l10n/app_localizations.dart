@@ -123,6 +123,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Capture'**
   String get homeCaptureLabel;
+
+  /// No description provided for @captureHint.
+  ///
+  /// In en, this message translates to:
+  /// **'What\'s hanging?'**
+  String get captureHint;
+
+  /// No description provided for @directionOutgoing.
+  ///
+  /// In en, this message translates to:
+  /// **'I owe'**
+  String get directionOutgoing;
+
+  /// No description provided for @directionIncoming.
+  ///
+  /// In en, this message translates to:
+  /// **'Waiting for'**
+  String get directionIncoming;
+
+  /// No description provided for @save.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get save;
+
+  /// No description provided for @saved.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved'**
+  String get saved;
 }
 
 class _AppLocalizationsDelegate

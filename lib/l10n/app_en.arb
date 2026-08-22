@@ -4,5 +4,10 @@
   "homeTitle": "Open loops",
   "homeEmptyTitle": "Nothing hanging right now.",
   "homeEmptyCta": "Capture your first loop",
-  "homeCaptureLabel": "Capture"
+  "homeCaptureLabel": "Capture",
+  "captureHint": "What's hanging?",
+  "directionOutgoing": "I owe",
+  "directionIncoming": "Waiting for",
+  "save": "Save",
+  "saved": "Saved"
 }
