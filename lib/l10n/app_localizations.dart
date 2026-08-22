@@ -124,6 +124,12 @@ abstract class AppLocalizations {
   /// **'Capture'**
   String get homeCaptureLabel;
 
+  /// No description provided for @homeError.
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong. Please try again.'**
+  String get homeError;
+
   /// No description provided for @captureHint.
   ///
   /// In en, this message translates to:

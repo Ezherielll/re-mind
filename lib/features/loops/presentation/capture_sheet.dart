@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../l10n/app_localizations.dart';
-import '../domain/commitment.dart';
+import '../../../core/domain/commitment.dart';
 import '../data/providers.dart';
 
 /// Capture flow (page spec: design-system/re-mind/pages/capture.md).
@@ -74,7 +74,6 @@ class _CaptureSheetState extends ConsumerState<CaptureSheet> {
             decoration: InputDecoration(
               border: const OutlineInputBorder(),
               hintText: l10n.captureHint,
-              label: Text(l10n.captureHint),
             ),
           ),
           const SizedBox(height: 16),

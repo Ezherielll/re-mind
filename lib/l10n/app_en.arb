@@ -5,6 +5,7 @@
   "homeEmptyTitle": "Nothing hanging right now.",
   "homeEmptyCta": "Capture your first loop",
   "homeCaptureLabel": "Capture",
+  "homeError": "Something went wrong. Please try again.",
   "captureHint": "What's hanging?",
   "directionOutgoing": "I owe",
   "directionIncoming": "Waiting for",

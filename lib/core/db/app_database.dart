@@ -5,7 +5,7 @@ import 'package:drift/native.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
-import '../../features/loops/domain/commitment.dart';
+import '../domain/commitment.dart';
 
 part 'app_database.g.dart';
 
@@ -20,6 +20,14 @@ class AppDatabase extends _$AppDatabase {
 
   @override
   int get schemaVersion => 1;
+
+  @override
+  MigrationStrategy get migration => MigrationStrategy(
+        onCreate: (m) => m.createAll(),
+        // Versioned from release 1 (ADR-0001): every schema bump adds a step
+        // here and a drift schema snapshot for migration tests.
+        onUpgrade: (m, from, to) async {},
+      );
 
   static LazyDatabase _openConnection() => LazyDatabase(() async {
         final dir = await getApplicationDocumentsDirectory();

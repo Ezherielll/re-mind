@@ -24,6 +24,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homeCaptureLabel => 'Capture';
 
   @override
+  String get homeError => 'Something went wrong. Please try again.';
+
+  @override
   String get captureHint => 'What\'s hanging?';
 
   @override

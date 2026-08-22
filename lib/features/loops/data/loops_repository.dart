@@ -1,7 +1,7 @@
 import 'package:drift/drift.dart';
 
 import '../../../core/db/app_database.dart';
-import '../domain/commitment.dart';
+import '../../../core/domain/commitment.dart';
 
 /// Persistence seam for open loops (ADR-0009). UI and controllers depend on
 /// this interface only; tests run the Drift implementation over an in-memory

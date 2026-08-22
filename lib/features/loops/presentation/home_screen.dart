@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/db/app_database.dart';
+import '../../../core/domain/commitment.dart';
 import '../../../l10n/app_localizations.dart';
 import '../data/providers.dart';
-import '../domain/commitment.dart';
 import 'capture_sheet.dart';
 
 /// Home screen: the single prioritized open-loop list (page spec:
@@ -35,10 +35,16 @@ class HomeScreen extends ConsumerWidget {
               Expanded(
                 child: loops.when(
                   loading: () => const SizedBox.shrink(),
-                  error: (_, _) => const SizedBox.shrink(),
-                  data: (items) => items.isEmpty
-                      ? _EmptyState()
-                      : _LoopList(items),
+                  error: (_, _) => Center(
+                    child: Text(
+                      l10n.homeError,
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                          ),
+                    ),
+                  ),
+                  data: (items) =>
+                      items.isEmpty ? _EmptyState() : _LoopList(items),
                 ),
               ),
             ],

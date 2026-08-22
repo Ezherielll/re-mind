@@ -1,59 +1,22 @@
-import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:re_mind/core/db/app_database.dart';
-import 'package:re_mind/core/db/providers.dart';
+import 'package:re_mind/core/domain/commitment.dart';
 import 'package:re_mind/features/loops/data/loops_repository.dart';
-import 'package:re_mind/features/loops/data/providers.dart';
-import 'package:re_mind/features/loops/domain/commitment.dart';
-import 'package:re_mind/main.dart';
+
+import '../../../support/app_test_harness.dart';
 
 void main() {
   late AppDatabase db;
 
   setUp(() {
-    db = AppDatabase(NativeDatabase.memory());
+    db = createInMemoryDb();
   });
   tearDown(() => db.close());
 
-  /// Pumps the app against a real in-memory Drift database.
-  ///
-  /// The Riverpod container is created manually and disposed via
-  /// addTearDown so stream subscriptions close BEFORE tearDown closes the
-  /// database — otherwise flutter_tester never goes idle and `flutter test`
-  /// hangs.
-  Future<void> pumpHome(WidgetTester tester) async {
-    final container = ProviderContainer(
-      overrides: [
-        databaseProvider.overrideWithValue(db),
-        loopsRepositoryProvider.overrideWith(
-          (ref) => DriftLoopsRepository(db),
-        ),
-      ],
-    );
-    addTearDown(container.dispose);
-    await tester.pumpWidget(
-      UncontrolledProviderScope(
-        container: container,
-        child: const ReMindApp(),
-      ),
-    );
-    await tester.pumpAndSettle();
-  }
-
-  /// Lets real async work (Drift writes) complete inside the fake-async
-  /// widget environment, then settles frames.
-  Future<void> settleRealAsync(WidgetTester tester) async {
-    await tester.runAsync(
-      () => Future<void>.delayed(const Duration(milliseconds: 100)),
-    );
-    await tester.pumpAndSettle();
-  }
-
   testWidgets('capture save path persists a loop and shows it on home',
       (tester) async {
-    await pumpHome(tester);
+    await pumpApp(tester, db);
 
     await tester.tap(find.byType(FloatingActionButton));
     await tester.pumpAndSettle();
@@ -72,7 +35,7 @@ void main() {
 
   testWidgets('save is disabled while the text field is empty',
       (tester) async {
-    await pumpHome(tester);
+    await pumpApp(tester, db);
 
     await tester.tap(find.byType(FloatingActionButton));
     await tester.pumpAndSettle();
@@ -85,7 +48,7 @@ void main() {
 
   testWidgets('toggling direction to Waiting for persists incoming',
       (tester) async {
-    await pumpHome(tester);
+    await pumpApp(tester, db);
 
     await tester.tap(find.byType(FloatingActionButton));
     await tester.pumpAndSettle();

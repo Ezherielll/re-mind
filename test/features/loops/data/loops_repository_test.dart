@@ -1,9 +1,11 @@
+import 'dart:io';
+
 import 'package:drift/drift.dart' show Value;
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:re_mind/core/db/app_database.dart';
+import 'package:re_mind/core/domain/commitment.dart';
 import 'package:re_mind/features/loops/data/loops_repository.dart';
-import 'package:re_mind/features/loops/domain/commitment.dart';
 
 void main() {
   late AppDatabase db;
@@ -81,5 +83,24 @@ void main() {
 
       final open = await repository.watchOpenLoops().first;
       expect(open, isEmpty);
+    });
+
+    test('data survives closing and reopening the database', () async {
+      final dir = Directory.systemTemp.createTempSync('re_mind_test');
+      addTearDown(() => dir.deleteSync(recursive: true));
+      final file = File('${dir.path}${Platform.pathSeparator}restart.sqlite');
+
+      final first = AppDatabase(NativeDatabase(file));
+      await DriftLoopsRepository(first).createCommitment(
+        title: 'Send revision to Budi',
+        direction: Direction.outgoing,
+      );
+      await first.close();
+
+      final reopened = AppDatabase(NativeDatabase(file));
+      addTearDown(reopened.close);
+      final open =
+          await DriftLoopsRepository(reopened).watchOpenLoops().first;
+      expect(open.single.title, 'Send revision to Budi');
     });  });
 }
