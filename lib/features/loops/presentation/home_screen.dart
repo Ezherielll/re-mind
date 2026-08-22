@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../core/db/app_database.dart';
-import '../../../core/domain/commitment.dart';
 import '../../../l10n/app_localizations.dart';
+import '../data/loops_repository.dart';
 import '../data/providers.dart';
 import 'capture_sheet.dart';
+import 'person_screen.dart';
+import 'widgets/loop_row.dart';
 
 /// Home screen: the single prioritized open-loop list (page spec:
 /// design-system/re-mind/pages/home.md). Grouping by derived status arrives
@@ -39,12 +40,14 @@ class HomeScreen extends ConsumerWidget {
                     child: Text(
                       l10n.homeError,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                            color:
+                                Theme.of(context).colorScheme.onSurfaceVariant,
                           ),
                     ),
                   ),
-                  data: (items) =>
-                      items.isEmpty ? _EmptyState() : _LoopList(items),
+                  data: (items) => items.isEmpty
+                      ? const _EmptyState()
+                      : _LoopList(items),
                 ),
               ),
             ],
@@ -73,7 +76,10 @@ class _EmptyState extends StatelessWidget {
         children: [
           Text('0', style: display?.copyWith(fontSize: 64)),
           const SizedBox(height: 8),
-          Text(l10n.homeEmptyTitle, style: Theme.of(context).textTheme.titleMedium),
+          Text(
+            l10n.homeEmptyTitle,
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
           const SizedBox(height: 16),
           TextButton(onPressed: () {}, child: Text(l10n.homeEmptyCta)),
         ],
@@ -85,7 +91,7 @@ class _EmptyState extends StatelessWidget {
 class _LoopList extends StatelessWidget {
   const _LoopList(this.items);
 
-  final List<Commitment> items;
+  final List<LoopWithPerson> items;
 
   @override
   Widget build(BuildContext context) {
@@ -94,17 +100,16 @@ class _LoopList extends StatelessWidget {
       itemCount: items.length,
       separatorBuilder: (_, _) => const Divider(height: 1),
       itemBuilder: (context, index) {
-        final loop = items[index];
-        return ListTile(
-          key: ValueKey(loop.id),
-          contentPadding: EdgeInsets.zero,
-          minVerticalPadding: 12,
-          leading: Icon(
-            loop.direction == Direction.outgoing
-                ? Icons.north_east
-                : Icons.south_west,
-          ),
-          title: Text(loop.title, maxLines: 1, overflow: TextOverflow.ellipsis),
+        final item = items[index];
+        return LoopRow(
+          item: item,
+          onTapPerson: item.person == null
+              ? null
+              : (person) => Navigator.of(context).push(
+                    MaterialPageRoute<void>(
+                      builder: (_) => PersonScreen(personId: person.id),
+                    ),
+                  ),
         );
       },
     );

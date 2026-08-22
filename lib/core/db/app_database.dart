@@ -14,7 +14,7 @@ part 'app_database.g.dart';
 /// Every mutable table carries `updatedAt`/`deletedAt` (soft delete) so a
 /// future sync engine has the metadata it needs. The event log records every
 /// state transition from day one.
-@DriftDatabase(tables: [Commitments, LoopEvents])
+@DriftDatabase(tables: [Commitments, LoopEvents, People])
 class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? executor]) : super(executor ?? _openConnection());
 
@@ -45,6 +45,9 @@ class Commitments extends Table {
   TextColumn get title => text()();
   TextColumn get direction => textEnum<Direction>()();
   TextColumn get status => textEnum<CommitmentStatus>()();
+  IntColumn get personId => integer()
+      .nullable()
+      .references(People, #id)();
   DateTimeColumn get dueDate => dateTime().nullable()();
   DateTimeColumn get followUpAt => dateTime().nullable()();
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
@@ -59,4 +62,16 @@ class LoopEvents extends Table {
       integer().references(Commitments, #id)();
   TextColumn get type => textEnum<LoopEventType>()();
   DateTimeColumn get occurredAt => dateTime().withDefault(currentDateAndTime)();
+}
+
+/// A counterparty, lazily created from free text during capture (CONTEXT.md).
+/// `normalizedName` is the dedupe key; `name` preserves what the user typed.
+@DataClassName('Person')
+class People extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  TextColumn get name => text()();
+  TextColumn get normalizedName => text().unique()();
+  DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
+  DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
+  DateTimeColumn get deletedAt => dateTime().nullable()();
 }

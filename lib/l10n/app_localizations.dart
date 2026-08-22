@@ -136,6 +136,12 @@ abstract class AppLocalizations {
   /// **'What\'s hanging?'**
   String get captureHint;
 
+  /// No description provided for @capturePersonHint.
+  ///
+  /// In en, this message translates to:
+  /// **'With whom? (optional)'**
+  String get capturePersonHint;
+
   /// No description provided for @directionOutgoing.
   ///
   /// In en, this message translates to:
@@ -159,6 +165,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Saved'**
   String get saved;
+
+  /// No description provided for @personOpenCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} open'**
+  String personOpenCount(Object count);
+
+  /// No description provided for @personNothingPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing pending with {name}.'**
+  String personNothingPending(Object name);
 }
 
 class _AppLocalizationsDelegate

@@ -53,7 +53,7 @@ void main() {
 
   group('watchOpenLoops', () {
     test('emits empty before any capture and the loop after it', () async {
-      final emissions = <List<Commitment>>[];
+      final emissions = <List<LoopWithPerson>>[];
       final subscription = repository.watchOpenLoops().listen(emissions.add);
       addTearDown(subscription.cancel);
 
@@ -69,7 +69,7 @@ void main() {
       await Future<void>.delayed(const Duration(milliseconds: 100));
 
       expect(emissions.last, hasLength(1));
-      expect(emissions.last.single.title, 'Send revision to Budi');
+      expect(emissions.last.single.commitment.title, 'Send revision to Budi');
     }, timeout: const Timeout(Duration(seconds: 10)));
 
     test('never emits loops that were soft-deleted', () async {
@@ -101,6 +101,76 @@ void main() {
       addTearDown(reopened.close);
       final open =
           await DriftLoopsRepository(reopened).watchOpenLoops().first;
-      expect(open.single.title, 'Send revision to Budi');
-    });  });
+      expect(open.single.commitment.title, 'Send revision to Budi');
+    });
+  });
+
+  group('findOrCreatePerson', () {
+    test('creates a person once and dedupes normalized names', () async {
+      final first = await repository.findOrCreatePerson('Budi Santoso');
+      final second =
+          await repository.findOrCreatePerson('  budi   santoso '.trim());
+      final third = await repository.findOrCreatePerson('Budi   santoso');
+
+      expect(first.id, second.id);
+      expect(first.id, third.id);
+      expect(first.name, 'Budi Santoso');
+    });
+
+    test('searchPeople matches prefixes and skips soft-deleted people',
+        () async {
+      final budi = await repository.findOrCreatePerson('Budi Santoso');
+      await repository.findOrCreatePerson('Bunga Citra');
+
+      await (db.update(db.people)..where((p) => p.id.equals(budi.id)))
+          .write(PeopleCompanion(deletedAt: Value(DateTime.now())));
+
+      final result = await repository.searchPeople('bud');
+      expect(result.map((p) => p.name), isNot(contains('Budi Santoso')));
+    });
+  });
+
+  group('loops with people', () {
+    test('createCommitment links a person and watchOpenLoops joins it',
+        () async {
+      final person = await repository.findOrCreatePerson('Budi Santoso');
+      await repository.createCommitment(
+        title: 'Send revision',
+        direction: Direction.outgoing,
+        personId: person.id,
+      );
+      await repository.createCommitment(
+        title: 'Renew license',
+        direction: Direction.outgoing,
+      );
+
+      final open = await repository.watchOpenLoops().first;
+
+      expect(open, hasLength(2));
+      final linked = open.singleWhere((l) => l.commitment.title == 'Send revision');
+      expect(linked.person?.name, 'Budi Santoso');
+      final unlinked =
+          open.singleWhere((l) => l.commitment.title == 'Renew license');
+      expect(unlinked.person, isNull);
+    });
+
+    test('watchOpenLoopsByPerson filters to that person only', () async {
+      final budi = await repository.findOrCreatePerson('Budi');
+      final sari = await repository.findOrCreatePerson('Sari');
+      await repository.createCommitment(
+        title: 'For Budi',
+        direction: Direction.incoming,
+        personId: budi.id,
+      );
+      await repository.createCommitment(
+        title: 'For Sari',
+        direction: Direction.outgoing,
+        personId: sari.id,
+      );
+
+      final budisLoops = await repository.watchOpenLoopsByPerson(budi.id).first;
+      expect(budisLoops, hasLength(1));
+      expect(budisLoops.single.commitment.title, 'For Budi');
+    });
+  });
 }

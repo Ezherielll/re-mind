@@ -7,8 +7,11 @@
   "homeCaptureLabel": "Capture",
   "homeError": "Something went wrong. Please try again.",
   "captureHint": "What's hanging?",
+  "capturePersonHint": "With whom? (optional)",
   "directionOutgoing": "I owe",
   "directionIncoming": "Waiting for",
   "save": "Save",
-  "saved": "Saved"
+  "saved": "Saved",
+  "personOpenCount": "{count} open",
+  "personNothingPending": "Nothing pending with {name}."
 }

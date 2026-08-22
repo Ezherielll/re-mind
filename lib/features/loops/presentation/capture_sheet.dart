@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../l10n/app_localizations.dart';
+import '../../../core/db/app_database.dart';
 import '../../../core/domain/commitment.dart';
+import '../../../l10n/app_localizations.dart';
 import '../data/providers.dart';
 
 /// Capture flow (page spec: design-system/re-mind/pages/capture.md).
 ///
-/// T02 scope: text + direction toggle + save. Person linking arrives with
-/// T03, date chips with T04.
+/// T03 scope adds the optional person field with prefix suggestions.
+/// Date chips arrive with T04.
 class CaptureSheet extends ConsumerStatefulWidget {
   const CaptureSheet({super.key});
 
@@ -26,24 +27,47 @@ class CaptureSheet extends ConsumerStatefulWidget {
 
 class _CaptureSheetState extends ConsumerState<CaptureSheet> {
   final _titleController = TextEditingController();
+  final _personController = TextEditingController();
+  List<Person> _suggestions = const [];
   Direction _direction = Direction.outgoing;
 
   @override
   void dispose() {
     _titleController.dispose();
+    _personController.dispose();
     super.dispose();
   }
 
   bool get _canSave => _titleController.text.trim().isNotEmpty;
+
+  Future<void> _searchPeople(String query) async {
+    final trimmed = query.trim();
+    if (trimmed.isEmpty) {
+      if (mounted) setState(() => _suggestions = const []);
+      return;
+    }
+    final results =
+        await ref.read(loopsRepositoryProvider).searchPeople(trimmed);
+    if (mounted) setState(() => _suggestions = results);
+  }
 
   Future<void> _save() async {
     final title = _titleController.text.trim();
     if (title.isEmpty) return;
     final l10n = AppLocalizations.of(context);
     final messenger = ScaffoldMessenger.of(context);
-    await ref
-        .read(loopsRepositoryProvider)
-        .createCommitment(title: title, direction: _direction);
+    final repository = ref.read(loopsRepositoryProvider);
+
+    final personName = _personController.text.trim();
+    final personId = personName.isEmpty
+        ? null
+        : (await repository.findOrCreatePerson(personName)).id;
+
+    await repository.createCommitment(
+      title: title,
+      direction: _direction,
+      personId: personId,
+    );
     if (!mounted) return;
     Navigator.of(context).pop();
     messenger.showSnackBar(SnackBar(content: Text(l10n.saved)));
@@ -92,6 +116,34 @@ class _CaptureSheetState extends ConsumerState<CaptureSheet> {
             onSelectionChanged: (selection) =>
                 setState(() => _direction = selection.first),
           ),
+          const SizedBox(height: 16),
+          TextField(
+            controller: _personController,
+            onChanged: _searchPeople,
+            decoration: InputDecoration(
+              border: const OutlineInputBorder(),
+              prefixIcon: const Icon(Icons.person_outline),
+              hintText: l10n.capturePersonHint,
+            ),
+          ),
+          if (_suggestions.isNotEmpty)
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Wrap(
+                spacing: 8,
+                children: [
+                  for (final person in _suggestions.take(4))
+                    ActionChip(
+                      key: ValueKey('suggest-${person.id}'),
+                      label: Text(person.name),
+                      onPressed: () {
+                        _personController.text = person.name;
+                        setState(() => _suggestions = const []);
+                      },
+                    ),
+                ],
+              ),
+            ),
           const SizedBox(height: 24),
           FilledButton(
             onPressed: _canSave ? _save : null,

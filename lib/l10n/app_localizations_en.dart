@@ -30,6 +30,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get captureHint => 'What\'s hanging?';
 
   @override
+  String get capturePersonHint => 'With whom? (optional)';
+
+  @override
   String get directionOutgoing => 'I owe';
 
   @override
@@ -40,4 +43,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get saved => 'Saved';
+
+  @override
+  String personOpenCount(Object count) {
+    return '$count open';
+  }
+
+  @override
+  String personNothingPending(Object name) {
+    return 'Nothing pending with $name.';
+  }
 }

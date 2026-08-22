@@ -3,6 +3,406 @@
 part of 'app_database.dart';
 
 // ignore_for_file: type=lint
+class $PeopleTable extends People with TableInfo<$PeopleTable, Person> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $PeopleTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _normalizedNameMeta = const VerificationMeta(
+    'normalizedName',
+  );
+  @override
+  late final GeneratedColumn<String> normalizedName = GeneratedColumn<String>(
+    'normalized_name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways('UNIQUE'),
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  static const VerificationMeta _deletedAtMeta = const VerificationMeta(
+    'deletedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> deletedAt = GeneratedColumn<DateTime>(
+    'deleted_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    name,
+    normalizedName,
+    createdAt,
+    updatedAt,
+    deletedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'people';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<Person> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('normalized_name')) {
+      context.handle(
+        _normalizedNameMeta,
+        normalizedName.isAcceptableOrUnknown(
+          data['normalized_name']!,
+          _normalizedNameMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_normalizedNameMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    }
+    if (data.containsKey('deleted_at')) {
+      context.handle(
+        _deletedAtMeta,
+        deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  Person map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Person(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      normalizedName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}normalized_name'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+      deletedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}deleted_at'],
+      ),
+    );
+  }
+
+  @override
+  $PeopleTable createAlias(String alias) {
+    return $PeopleTable(attachedDatabase, alias);
+  }
+}
+
+class Person extends DataClass implements Insertable<Person> {
+  final int id;
+  final String name;
+  final String normalizedName;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final DateTime? deletedAt;
+  const Person({
+    required this.id,
+    required this.name,
+    required this.normalizedName,
+    required this.createdAt,
+    required this.updatedAt,
+    this.deletedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['name'] = Variable<String>(name);
+    map['normalized_name'] = Variable<String>(normalizedName);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    if (!nullToAbsent || deletedAt != null) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt);
+    }
+    return map;
+  }
+
+  PeopleCompanion toCompanion(bool nullToAbsent) {
+    return PeopleCompanion(
+      id: Value(id),
+      name: Value(name),
+      normalizedName: Value(normalizedName),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+      deletedAt: deletedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(deletedAt),
+    );
+  }
+
+  factory Person.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Person(
+      id: serializer.fromJson<int>(json['id']),
+      name: serializer.fromJson<String>(json['name']),
+      normalizedName: serializer.fromJson<String>(json['normalizedName']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+      deletedAt: serializer.fromJson<DateTime?>(json['deletedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'name': serializer.toJson<String>(name),
+      'normalizedName': serializer.toJson<String>(normalizedName),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+      'deletedAt': serializer.toJson<DateTime?>(deletedAt),
+    };
+  }
+
+  Person copyWith({
+    int? id,
+    String? name,
+    String? normalizedName,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    Value<DateTime?> deletedAt = const Value.absent(),
+  }) => Person(
+    id: id ?? this.id,
+    name: name ?? this.name,
+    normalizedName: normalizedName ?? this.normalizedName,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+    deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
+  );
+  Person copyWithCompanion(PeopleCompanion data) {
+    return Person(
+      id: data.id.present ? data.id.value : this.id,
+      name: data.name.present ? data.name.value : this.name,
+      normalizedName: data.normalizedName.present
+          ? data.normalizedName.value
+          : this.normalizedName,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('Person(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('normalizedName: $normalizedName, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, name, normalizedName, createdAt, updatedAt, deletedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Person &&
+          other.id == this.id &&
+          other.name == this.name &&
+          other.normalizedName == this.normalizedName &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt &&
+          other.deletedAt == this.deletedAt);
+}
+
+class PeopleCompanion extends UpdateCompanion<Person> {
+  final Value<int> id;
+  final Value<String> name;
+  final Value<String> normalizedName;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  final Value<DateTime?> deletedAt;
+  const PeopleCompanion({
+    this.id = const Value.absent(),
+    this.name = const Value.absent(),
+    this.normalizedName = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+  });
+  PeopleCompanion.insert({
+    this.id = const Value.absent(),
+    required String name,
+    required String normalizedName,
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+  }) : name = Value(name),
+       normalizedName = Value(normalizedName);
+  static Insertable<Person> custom({
+    Expression<int>? id,
+    Expression<String>? name,
+    Expression<String>? normalizedName,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<DateTime>? deletedAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (name != null) 'name': name,
+      if (normalizedName != null) 'normalized_name': normalizedName,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (deletedAt != null) 'deleted_at': deletedAt,
+    });
+  }
+
+  PeopleCompanion copyWith({
+    Value<int>? id,
+    Value<String>? name,
+    Value<String>? normalizedName,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+    Value<DateTime?>? deletedAt,
+  }) {
+    return PeopleCompanion(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      normalizedName: normalizedName ?? this.normalizedName,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      deletedAt: deletedAt ?? this.deletedAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (normalizedName.present) {
+      map['normalized_name'] = Variable<String>(normalizedName.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (deletedAt.present) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PeopleCompanion(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('normalizedName: $normalizedName, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class $CommitmentsTable extends Commitments
     with TableInfo<$CommitmentsTable, Commitment> {
   @override
@@ -49,6 +449,20 @@ class $CommitmentsTable extends Commitments
         type: DriftSqlType.string,
         requiredDuringInsert: true,
       ).withConverter<CommitmentStatus>($CommitmentsTable.$converterstatus);
+  static const VerificationMeta _personIdMeta = const VerificationMeta(
+    'personId',
+  );
+  @override
+  late final GeneratedColumn<int> personId = GeneratedColumn<int>(
+    'person_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES people (id)',
+    ),
+  );
   static const VerificationMeta _dueDateMeta = const VerificationMeta(
     'dueDate',
   );
@@ -112,6 +526,7 @@ class $CommitmentsTable extends Commitments
     title,
     direction,
     status,
+    personId,
     dueDate,
     followUpAt,
     createdAt,
@@ -140,6 +555,12 @@ class $CommitmentsTable extends Commitments
       );
     } else if (isInserting) {
       context.missing(_titleMeta);
+    }
+    if (data.containsKey('person_id')) {
+      context.handle(
+        _personIdMeta,
+        personId.isAcceptableOrUnknown(data['person_id']!, _personIdMeta),
+      );
     }
     if (data.containsKey('due_date')) {
       context.handle(
@@ -203,6 +624,10 @@ class $CommitmentsTable extends Commitments
           data['${effectivePrefix}status'],
         )!,
       ),
+      personId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}person_id'],
+      ),
       dueDate: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}due_date'],
@@ -242,6 +667,7 @@ class Commitment extends DataClass implements Insertable<Commitment> {
   final String title;
   final Direction direction;
   final CommitmentStatus status;
+  final int? personId;
   final DateTime? dueDate;
   final DateTime? followUpAt;
   final DateTime createdAt;
@@ -252,6 +678,7 @@ class Commitment extends DataClass implements Insertable<Commitment> {
     required this.title,
     required this.direction,
     required this.status,
+    this.personId,
     this.dueDate,
     this.followUpAt,
     required this.createdAt,
@@ -273,6 +700,9 @@ class Commitment extends DataClass implements Insertable<Commitment> {
         $CommitmentsTable.$converterstatus.toSql(status),
       );
     }
+    if (!nullToAbsent || personId != null) {
+      map['person_id'] = Variable<int>(personId);
+    }
     if (!nullToAbsent || dueDate != null) {
       map['due_date'] = Variable<DateTime>(dueDate);
     }
@@ -293,6 +723,9 @@ class Commitment extends DataClass implements Insertable<Commitment> {
       title: Value(title),
       direction: Value(direction),
       status: Value(status),
+      personId: personId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(personId),
       dueDate: dueDate == null && nullToAbsent
           ? const Value.absent()
           : Value(dueDate),
@@ -321,6 +754,7 @@ class Commitment extends DataClass implements Insertable<Commitment> {
       status: $CommitmentsTable.$converterstatus.fromJson(
         serializer.fromJson<String>(json['status']),
       ),
+      personId: serializer.fromJson<int?>(json['personId']),
       dueDate: serializer.fromJson<DateTime?>(json['dueDate']),
       followUpAt: serializer.fromJson<DateTime?>(json['followUpAt']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
@@ -340,6 +774,7 @@ class Commitment extends DataClass implements Insertable<Commitment> {
       'status': serializer.toJson<String>(
         $CommitmentsTable.$converterstatus.toJson(status),
       ),
+      'personId': serializer.toJson<int?>(personId),
       'dueDate': serializer.toJson<DateTime?>(dueDate),
       'followUpAt': serializer.toJson<DateTime?>(followUpAt),
       'createdAt': serializer.toJson<DateTime>(createdAt),
@@ -353,6 +788,7 @@ class Commitment extends DataClass implements Insertable<Commitment> {
     String? title,
     Direction? direction,
     CommitmentStatus? status,
+    Value<int?> personId = const Value.absent(),
     Value<DateTime?> dueDate = const Value.absent(),
     Value<DateTime?> followUpAt = const Value.absent(),
     DateTime? createdAt,
@@ -363,6 +799,7 @@ class Commitment extends DataClass implements Insertable<Commitment> {
     title: title ?? this.title,
     direction: direction ?? this.direction,
     status: status ?? this.status,
+    personId: personId.present ? personId.value : this.personId,
     dueDate: dueDate.present ? dueDate.value : this.dueDate,
     followUpAt: followUpAt.present ? followUpAt.value : this.followUpAt,
     createdAt: createdAt ?? this.createdAt,
@@ -375,6 +812,7 @@ class Commitment extends DataClass implements Insertable<Commitment> {
       title: data.title.present ? data.title.value : this.title,
       direction: data.direction.present ? data.direction.value : this.direction,
       status: data.status.present ? data.status.value : this.status,
+      personId: data.personId.present ? data.personId.value : this.personId,
       dueDate: data.dueDate.present ? data.dueDate.value : this.dueDate,
       followUpAt: data.followUpAt.present
           ? data.followUpAt.value
@@ -392,6 +830,7 @@ class Commitment extends DataClass implements Insertable<Commitment> {
           ..write('title: $title, ')
           ..write('direction: $direction, ')
           ..write('status: $status, ')
+          ..write('personId: $personId, ')
           ..write('dueDate: $dueDate, ')
           ..write('followUpAt: $followUpAt, ')
           ..write('createdAt: $createdAt, ')
@@ -407,6 +846,7 @@ class Commitment extends DataClass implements Insertable<Commitment> {
     title,
     direction,
     status,
+    personId,
     dueDate,
     followUpAt,
     createdAt,
@@ -421,6 +861,7 @@ class Commitment extends DataClass implements Insertable<Commitment> {
           other.title == this.title &&
           other.direction == this.direction &&
           other.status == this.status &&
+          other.personId == this.personId &&
           other.dueDate == this.dueDate &&
           other.followUpAt == this.followUpAt &&
           other.createdAt == this.createdAt &&
@@ -433,6 +874,7 @@ class CommitmentsCompanion extends UpdateCompanion<Commitment> {
   final Value<String> title;
   final Value<Direction> direction;
   final Value<CommitmentStatus> status;
+  final Value<int?> personId;
   final Value<DateTime?> dueDate;
   final Value<DateTime?> followUpAt;
   final Value<DateTime> createdAt;
@@ -443,6 +885,7 @@ class CommitmentsCompanion extends UpdateCompanion<Commitment> {
     this.title = const Value.absent(),
     this.direction = const Value.absent(),
     this.status = const Value.absent(),
+    this.personId = const Value.absent(),
     this.dueDate = const Value.absent(),
     this.followUpAt = const Value.absent(),
     this.createdAt = const Value.absent(),
@@ -454,6 +897,7 @@ class CommitmentsCompanion extends UpdateCompanion<Commitment> {
     required String title,
     required Direction direction,
     required CommitmentStatus status,
+    this.personId = const Value.absent(),
     this.dueDate = const Value.absent(),
     this.followUpAt = const Value.absent(),
     this.createdAt = const Value.absent(),
@@ -467,6 +911,7 @@ class CommitmentsCompanion extends UpdateCompanion<Commitment> {
     Expression<String>? title,
     Expression<String>? direction,
     Expression<String>? status,
+    Expression<int>? personId,
     Expression<DateTime>? dueDate,
     Expression<DateTime>? followUpAt,
     Expression<DateTime>? createdAt,
@@ -478,6 +923,7 @@ class CommitmentsCompanion extends UpdateCompanion<Commitment> {
       if (title != null) 'title': title,
       if (direction != null) 'direction': direction,
       if (status != null) 'status': status,
+      if (personId != null) 'person_id': personId,
       if (dueDate != null) 'due_date': dueDate,
       if (followUpAt != null) 'follow_up_at': followUpAt,
       if (createdAt != null) 'created_at': createdAt,
@@ -491,6 +937,7 @@ class CommitmentsCompanion extends UpdateCompanion<Commitment> {
     Value<String>? title,
     Value<Direction>? direction,
     Value<CommitmentStatus>? status,
+    Value<int?>? personId,
     Value<DateTime?>? dueDate,
     Value<DateTime?>? followUpAt,
     Value<DateTime>? createdAt,
@@ -502,6 +949,7 @@ class CommitmentsCompanion extends UpdateCompanion<Commitment> {
       title: title ?? this.title,
       direction: direction ?? this.direction,
       status: status ?? this.status,
+      personId: personId ?? this.personId,
       dueDate: dueDate ?? this.dueDate,
       followUpAt: followUpAt ?? this.followUpAt,
       createdAt: createdAt ?? this.createdAt,
@@ -529,6 +977,9 @@ class CommitmentsCompanion extends UpdateCompanion<Commitment> {
         $CommitmentsTable.$converterstatus.toSql(status.value),
       );
     }
+    if (personId.present) {
+      map['person_id'] = Variable<int>(personId.value);
+    }
     if (dueDate.present) {
       map['due_date'] = Variable<DateTime>(dueDate.value);
     }
@@ -554,6 +1005,7 @@ class CommitmentsCompanion extends UpdateCompanion<Commitment> {
           ..write('title: $title, ')
           ..write('direction: $direction, ')
           ..write('status: $status, ')
+          ..write('personId: $personId, ')
           ..write('dueDate: $dueDate, ')
           ..write('followUpAt: $followUpAt, ')
           ..write('createdAt: $createdAt, ')
@@ -880,21 +1332,336 @@ class LoopEventsCompanion extends UpdateCompanion<LoopEvent> {
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
+  late final $PeopleTable people = $PeopleTable(this);
   late final $CommitmentsTable commitments = $CommitmentsTable(this);
   late final $LoopEventsTable loopEvents = $LoopEventsTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
-  List<DatabaseSchemaEntity> get allSchemaEntities => [commitments, loopEvents];
+  List<DatabaseSchemaEntity> get allSchemaEntities => [
+    people,
+    commitments,
+    loopEvents,
+  ];
 }
 
+typedef $$PeopleTableCreateCompanionBuilder =
+    PeopleCompanion Function({
+      Value<int> id,
+      required String name,
+      required String normalizedName,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<DateTime?> deletedAt,
+    });
+typedef $$PeopleTableUpdateCompanionBuilder =
+    PeopleCompanion Function({
+      Value<int> id,
+      Value<String> name,
+      Value<String> normalizedName,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<DateTime?> deletedAt,
+    });
+
+final class $$PeopleTableReferences
+    extends BaseReferences<_$AppDatabase, $PeopleTable, Person> {
+  $$PeopleTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static MultiTypedResultKey<$CommitmentsTable, List<Commitment>>
+  _commitmentsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.commitments,
+    aliasName: 'people__id__commitments__person_id',
+  );
+
+  $$CommitmentsTableProcessedTableManager get commitmentsRefs {
+    final manager = $$CommitmentsTableTableManager(
+      $_db,
+      $_db.commitments,
+    ).filter((f) => f.personId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_commitmentsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $$PeopleTableFilterComposer
+    extends Composer<_$AppDatabase, $PeopleTable> {
+  $$PeopleTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get normalizedName => $composableBuilder(
+    column: $table.normalizedName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  Expression<bool> commitmentsRefs(
+    Expression<bool> Function($$CommitmentsTableFilterComposer f) f,
+  ) {
+    final $$CommitmentsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.commitments,
+      getReferencedColumn: (t) => t.personId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CommitmentsTableFilterComposer(
+            $db: $db,
+            $table: $db.commitments,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$PeopleTableOrderingComposer
+    extends Composer<_$AppDatabase, $PeopleTable> {
+  $$PeopleTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get normalizedName => $composableBuilder(
+    column: $table.normalizedName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$PeopleTableAnnotationComposer
+    extends Composer<_$AppDatabase, $PeopleTable> {
+  $$PeopleTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<String> get normalizedName => $composableBuilder(
+    column: $table.normalizedName,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get deletedAt =>
+      $composableBuilder(column: $table.deletedAt, builder: (column) => column);
+
+  Expression<T> commitmentsRefs<T extends Object>(
+    Expression<T> Function($$CommitmentsTableAnnotationComposer a) f,
+  ) {
+    final $$CommitmentsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.commitments,
+      getReferencedColumn: (t) => t.personId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CommitmentsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.commitments,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$PeopleTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $PeopleTable,
+          Person,
+          $$PeopleTableFilterComposer,
+          $$PeopleTableOrderingComposer,
+          $$PeopleTableAnnotationComposer,
+          $$PeopleTableCreateCompanionBuilder,
+          $$PeopleTableUpdateCompanionBuilder,
+          (Person, $$PeopleTableReferences),
+          Person,
+          PrefetchHooks Function({bool commitmentsRefs})
+        > {
+  $$PeopleTableTableManager(_$AppDatabase db, $PeopleTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$PeopleTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$PeopleTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$PeopleTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<String> normalizedName = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<DateTime?> deletedAt = const Value.absent(),
+              }) => PeopleCompanion(
+                id: id,
+                name: name,
+                normalizedName: normalizedName,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                deletedAt: deletedAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required String name,
+                required String normalizedName,
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<DateTime?> deletedAt = const Value.absent(),
+              }) => PeopleCompanion.insert(
+                id: id,
+                name: name,
+                normalizedName: normalizedName,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                deletedAt: deletedAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) =>
+                    (e.readTable(table), $$PeopleTableReferences(db, table, e)),
+              )
+              .toList(),
+          prefetchHooksCallback: ({commitmentsRefs = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [if (commitmentsRefs) db.commitments],
+              addJoins: null,
+              getPrefetchedDataCallback: (items) async {
+                return [
+                  if (commitmentsRefs)
+                    await $_getPrefetchedData<Person, $PeopleTable, Commitment>(
+                      currentTable: table,
+                      referencedTable: $$PeopleTableReferences
+                          ._commitmentsRefsTable(db),
+                      managerFromTypedResult: (p0) => $$PeopleTableReferences(
+                        db,
+                        table,
+                        p0,
+                      ).commitmentsRefs,
+                      referencedItemsForCurrentItem: (item, referencedItems) =>
+                          referencedItems.where((e) => e.personId == item.id),
+                      typedResults: items,
+                    ),
+                ];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$PeopleTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $PeopleTable,
+      Person,
+      $$PeopleTableFilterComposer,
+      $$PeopleTableOrderingComposer,
+      $$PeopleTableAnnotationComposer,
+      $$PeopleTableCreateCompanionBuilder,
+      $$PeopleTableUpdateCompanionBuilder,
+      (Person, $$PeopleTableReferences),
+      Person,
+      PrefetchHooks Function({bool commitmentsRefs})
+    >;
 typedef $$CommitmentsTableCreateCompanionBuilder =
     CommitmentsCompanion Function({
       Value<int> id,
       required String title,
       required Direction direction,
       required CommitmentStatus status,
+      Value<int?> personId,
       Value<DateTime?> dueDate,
       Value<DateTime?> followUpAt,
       Value<DateTime> createdAt,
@@ -907,6 +1674,7 @@ typedef $$CommitmentsTableUpdateCompanionBuilder =
       Value<String> title,
       Value<Direction> direction,
       Value<CommitmentStatus> status,
+      Value<int?> personId,
       Value<DateTime?> dueDate,
       Value<DateTime?> followUpAt,
       Value<DateTime> createdAt,
@@ -917,6 +1685,23 @@ typedef $$CommitmentsTableUpdateCompanionBuilder =
 final class $$CommitmentsTableReferences
     extends BaseReferences<_$AppDatabase, $CommitmentsTable, Commitment> {
   $$CommitmentsTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $PeopleTable _personIdTable(_$AppDatabase db) =>
+      db.people.createAlias('commitments__person_id__people__id');
+
+  $$PeopleTableProcessedTableManager? get personId {
+    final $_column = $_itemColumn<int>('person_id');
+    if ($_column == null) return null;
+    final manager = $$PeopleTableTableManager(
+      $_db,
+      $_db.people,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_personIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
 
   static MultiTypedResultKey<$LoopEventsTable, List<LoopEvent>>
   _loopEventsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
@@ -992,6 +1777,29 @@ class $$CommitmentsTableFilterComposer
     column: $table.deletedAt,
     builder: (column) => ColumnFilters(column),
   );
+
+  $$PeopleTableFilterComposer get personId {
+    final $$PeopleTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.personId,
+      referencedTable: $db.people,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PeopleTableFilterComposer(
+            $db: $db,
+            $table: $db.people,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
 
   Expression<bool> loopEventsRefs(
     Expression<bool> Function($$LoopEventsTableFilterComposer f) f,
@@ -1072,6 +1880,29 @@ class $$CommitmentsTableOrderingComposer
     column: $table.deletedAt,
     builder: (column) => ColumnOrderings(column),
   );
+
+  $$PeopleTableOrderingComposer get personId {
+    final $$PeopleTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.personId,
+      referencedTable: $db.people,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PeopleTableOrderingComposer(
+            $db: $db,
+            $table: $db.people,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
 }
 
 class $$CommitmentsTableAnnotationComposer
@@ -1112,6 +1943,29 @@ class $$CommitmentsTableAnnotationComposer
   GeneratedColumn<DateTime> get deletedAt =>
       $composableBuilder(column: $table.deletedAt, builder: (column) => column);
 
+  $$PeopleTableAnnotationComposer get personId {
+    final $$PeopleTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.personId,
+      referencedTable: $db.people,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PeopleTableAnnotationComposer(
+            $db: $db,
+            $table: $db.people,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
   Expression<T> loopEventsRefs<T extends Object>(
     Expression<T> Function($$LoopEventsTableAnnotationComposer a) f,
   ) {
@@ -1151,7 +2005,7 @@ class $$CommitmentsTableTableManager
           $$CommitmentsTableUpdateCompanionBuilder,
           (Commitment, $$CommitmentsTableReferences),
           Commitment,
-          PrefetchHooks Function({bool loopEventsRefs})
+          PrefetchHooks Function({bool personId, bool loopEventsRefs})
         > {
   $$CommitmentsTableTableManager(_$AppDatabase db, $CommitmentsTable table)
     : super(
@@ -1170,6 +2024,7 @@ class $$CommitmentsTableTableManager
                 Value<String> title = const Value.absent(),
                 Value<Direction> direction = const Value.absent(),
                 Value<CommitmentStatus> status = const Value.absent(),
+                Value<int?> personId = const Value.absent(),
                 Value<DateTime?> dueDate = const Value.absent(),
                 Value<DateTime?> followUpAt = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
@@ -1180,6 +2035,7 @@ class $$CommitmentsTableTableManager
                 title: title,
                 direction: direction,
                 status: status,
+                personId: personId,
                 dueDate: dueDate,
                 followUpAt: followUpAt,
                 createdAt: createdAt,
@@ -1192,6 +2048,7 @@ class $$CommitmentsTableTableManager
                 required String title,
                 required Direction direction,
                 required CommitmentStatus status,
+                Value<int?> personId = const Value.absent(),
                 Value<DateTime?> dueDate = const Value.absent(),
                 Value<DateTime?> followUpAt = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
@@ -1202,6 +2059,7 @@ class $$CommitmentsTableTableManager
                 title: title,
                 direction: direction,
                 status: status,
+                personId: personId,
                 dueDate: dueDate,
                 followUpAt: followUpAt,
                 createdAt: createdAt,
@@ -1216,11 +2074,42 @@ class $$CommitmentsTableTableManager
                 ),
               )
               .toList(),
-          prefetchHooksCallback: ({loopEventsRefs = false}) {
+          prefetchHooksCallback: ({personId = false, loopEventsRefs = false}) {
             return PrefetchHooks(
               db: db,
               explicitlyWatchedTables: [if (loopEventsRefs) db.loopEvents],
-              addJoins: null,
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (personId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.personId,
+                                referencedTable: $$CommitmentsTableReferences
+                                    ._personIdTable(db),
+                                referencedColumn: $$CommitmentsTableReferences
+                                    ._personIdTable(db)
+                                    .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
               getPrefetchedDataCallback: (items) async {
                 return [
                   if (loopEventsRefs)
@@ -1264,7 +2153,7 @@ typedef $$CommitmentsTableProcessedTableManager =
       $$CommitmentsTableUpdateCompanionBuilder,
       (Commitment, $$CommitmentsTableReferences),
       Commitment,
-      PrefetchHooks Function({bool loopEventsRefs})
+      PrefetchHooks Function({bool personId, bool loopEventsRefs})
     >;
 typedef $$LoopEventsTableCreateCompanionBuilder =
     LoopEventsCompanion Function({
@@ -1565,6 +2454,8 @@ typedef $$LoopEventsTableProcessedTableManager =
 class $AppDatabaseManager {
   final _$AppDatabase _db;
   $AppDatabaseManager(this._db);
+  $$PeopleTableTableManager get people =>
+      $$PeopleTableTableManager(_db, _db.people);
   $$CommitmentsTableTableManager get commitments =>
       $$CommitmentsTableTableManager(_db, _db.commitments);
   $$LoopEventsTableTableManager get loopEvents =>

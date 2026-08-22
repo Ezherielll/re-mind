@@ -21,15 +21,18 @@ void main() {
     await tester.tap(find.byType(FloatingActionButton));
     await tester.pumpAndSettle();
 
-    await tester.enterText(find.byType(TextField), 'Send revision to Budi');
-    await tester.pump(); // rebuild with the Save button enabled
+    await tester.enterText(find.byType(TextField).first, 'Send revision to Budi');
+    final personField = find.byType(TextField).at(1);
+    await tester.enterText(personField, 'Budi Santoso');
+    await settleRealAsync(tester);
     // Direction defaults to "I owe"; save directly.
     await tester.tap(find.widgetWithText(FilledButton, 'Save'));
     await settleRealAsync(tester);
 
-    // Sheet closed, loop visible on home, empty state gone.
+    // Sheet closed, loop visible on home with its person chip.
     expect(find.widgetWithText(FilledButton, 'Save'), findsNothing);
     expect(find.text('Send revision to Budi'), findsOneWidget);
+    expect(find.text('Budi Santoso'), findsOneWidget);
     expect(find.text('Nothing hanging right now.'), findsNothing);
   });
 
@@ -53,7 +56,7 @@ void main() {
     await tester.tap(find.byType(FloatingActionButton));
     await tester.pumpAndSettle();
     await tester.enterText(
-      find.byType(TextField),
+      find.byType(TextField).first,
       'Awaiting data from Budi',
     );
     await tester.pump(); // rebuild with the Save button enabled
@@ -65,6 +68,6 @@ void main() {
     final loops = await tester.runAsync(
       () => DriftLoopsRepository(db).watchOpenLoops().first,
     );
-    expect(loops!.single.direction, Direction.incoming);
+    expect(loops!.single.commitment.direction, Direction.incoming);
   });
 }
