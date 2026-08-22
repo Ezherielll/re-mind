@@ -59,4 +59,40 @@ void main() {
     expect(find.text('Nothing pending with Sari.'), findsOneWidget);
     await drainStreams(tester);
   });
+
+
+  testWidgets('archived section lists done loops for the person',
+      (tester) async {
+    final repository = DriftLoopsRepository(db);
+    final budi = await repository.findOrCreatePerson('Budi');
+    await repository.createCommitment(
+      title: 'Open task',
+      direction: Direction.outgoing,
+      personId: budi.id,
+    );
+    final done = await repository.createCommitment(
+      title: 'Old task',
+      direction: Direction.outgoing,
+      personId: budi.id,
+    );
+    await repository.markDone(done.id);
+
+    await pumpScreen(
+      tester,
+      db: db,
+      home: (_) => PersonScreen(personId: budi.id),
+    );
+    await settleRealAsync(tester);
+
+    // Open loop visible; archived collapsed header with count.
+    expect(find.text('Open task'), findsOneWidget);
+    expect(find.text('Archived · 1'), findsOneWidget);
+    expect(find.text('Old task'), findsNothing);
+
+    // Expand shows the archived row.
+    await tester.tap(find.text('Archived · 1'));
+    await tester.pumpAndSettle();
+    expect(find.text('Old task'), findsOneWidget);
+    await drainStreams(tester);
+  });
 }

@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:re_mind/core/db/app_database.dart';
 import 'package:re_mind/core/domain/commitment.dart';
@@ -162,6 +163,35 @@ void main() {
     final stored = (await repository.getLoop(loop.id))!.commitment;
     expect(stored.followUpAt, isNotNull);
     expect(stored.followUpAt!.hour, 9);
+    await drainStreams(tester);
+  });
+
+
+  testWidgets('archived loop renders Reopen instead of action bar',
+      (tester) async {
+    final loop = await repository.createCommitment(
+      title: 'Send revision',
+      direction: Direction.outgoing,
+    );
+    await repository.markDone(loop.id);
+
+    await pumpScreen(
+      tester,
+      db: db,
+      home: (_) => LoopDetailScreen(loopId: loop.id),
+    );
+    await settleRealAsync(tester);
+
+    expect(find.text('Send revision'), findsOneWidget);
+    expect(find.text('Reopen'), findsOneWidget);
+    expect(find.widgetWithText(FilledButton, 'Followed up'), findsNothing);
+    expect(find.widgetWithText(FilledButton, 'Done'), findsNothing);
+
+    // Reopen restores it to open.
+    await tester.tap(find.text('Reopen'));
+    await settleRealAsync(tester);
+    final stored = (await repository.getLoop(loop.id))!.commitment;
+    expect(stored.status, CommitmentStatus.open);
     await drainStreams(tester);
   });
 }
