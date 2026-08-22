@@ -25,7 +25,15 @@ class FakeScheduler implements ReminderScheduler {
   }
 
   @override
-  Future<void> scheduleDailyDigest({required int hour, required int minute}) async {}
+  Future<void> scheduleDailyDigest({
+    required int hour,
+    required int minute,
+    String? body,
+  }) async {
+    digestCalls.add((hour, minute, body));
+  }
+
+  final digestCalls = <(int, int, String?)>[];
 
   @override
   Future<void> requestPermission() async {}

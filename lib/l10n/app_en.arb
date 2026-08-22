@@ -39,5 +39,10 @@
   "reminderMoved": "Reminder moved to {when}",
   "archivedToast": "Archived",
   "undo": "Undo",
-  "reopen": "Reopen"
+  "reopen": "Reopen",
+  "dailyCheckIn": "Daily check-in",
+  "digestNone": "All clear — nothing hanging.",
+  "digestHanging": "{count} things hanging",
+  "digestChase": ", {count} to chase today",
+  "settingsTitle": "Settings"
 }

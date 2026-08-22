@@ -4,9 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/domain/commitment.dart';
+import '../../../core/domain/digest.dart';
 import '../../../core/domain/derived_status.dart';
 import '../../../l10n/app_localizations.dart';
 import '../data/providers.dart';
+import '../../settings/presentation/settings_screen.dart';
 import '../data/reminder_coordinator.dart';
 import 'capture_sheet.dart';
 import 'home_groups.dart';
@@ -36,14 +38,28 @@ class HomeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final loops = ref.watch(openLoopsProvider);
-    // Keep scheduled item alerts in sync with the open-loop list (T07).
+    // Keep scheduled item alerts + digest fresh with live data (T07/T08).
     ref.listen(openLoopsProvider, (_, next) {
       final items = next.value;
-      if (items != null) {
-        unawaited(
-          ref.read(reminderCoordinatorProvider).sync(items),
-        );
-      }
+      if (items == null) return;
+      final now = DateTime.now();
+      final dueTodayCount = items
+          .where((l) => isDueToday(l.commitment.dueDate, now))
+          .length;
+      unawaited(
+        ref.read(reminderCoordinatorProvider).sync(
+              items,
+              now: now,
+              digestTime: ref.watch(digestTimeProvider).value,
+              digestBody: composeDigestBody(
+                totalOpen: items.length,
+                dueToday: dueTodayCount,
+                noneTemplate: l10n.digestNone,
+                hangingTemplate: (Object c) => l10n.digestHanging(c),
+                chaseTemplate: (Object c) => l10n.digestChase(c),
+              ),
+            ),
+      );
     });
     final totalOpen = loops.value?.length ?? 0;
     return Scaffold(
@@ -82,6 +98,16 @@ class HomeScreen extends ConsumerWidget {
                       ),
                     ),
                   ],
+                  const Spacer(),
+                  IconButton(
+                    tooltip: l10n.settingsTitle,
+                    onPressed: () => Navigator.of(context).push(
+                      MaterialPageRoute<void>(
+                        builder: (_) => const SettingsScreen(),
+                      ),
+                    ),
+                    icon: const Icon(Icons.settings_outlined),
+                  ),
                 ],
               ),
               const SizedBox(height: 8),

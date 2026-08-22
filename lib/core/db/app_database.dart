@@ -14,7 +14,7 @@ part 'app_database.g.dart';
 /// Every mutable table carries `updatedAt`/`deletedAt` (soft delete) so a
 /// future sync engine has the metadata it needs. The event log records every
 /// state transition from day one.
-@DriftDatabase(tables: [Commitments, LoopEvents, People])
+@DriftDatabase(tables: [Commitments, LoopEvents, People, AppSettings])
 class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? executor]) : super(executor ?? _openConnection());
 
@@ -74,4 +74,28 @@ class People extends Table {
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
   DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
   DateTimeColumn get deletedAt => dateTime().nullable()();
+}
+
+/// Tiny key/value store for app-level preferences (e.g. digest time).
+/// Pre-release: folds into schema v1.
+class AppSettings extends Table {
+  TextColumn get key => text()();
+  TextColumn get value => text()();
+
+  @override
+  Set<Column> get primaryKey => {key};
+}
+extension SettingsDao on AppDatabase {
+  static const digestKey = 'digest_time';
+
+  Future<String?> getSetting(String key) async {
+    final row = await (select(appSettings)..where((s) => s.key.equals(key)))
+        .getSingleOrNull();
+    return row?.value;
+  }
+
+  Future<void> setSetting(String key, String value) =>
+      into(appSettings).insertOnConflictUpdate(
+        AppSettingsCompanion.insert(key: key, value: value),
+      );
 }

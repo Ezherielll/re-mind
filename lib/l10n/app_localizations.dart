@@ -333,6 +333,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Reopen'**
   String get reopen;
+
+  /// No description provided for @dailyCheckIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily check-in'**
+  String get dailyCheckIn;
+
+  /// No description provided for @digestNone.
+  ///
+  /// In en, this message translates to:
+  /// **'All clear — nothing hanging.'**
+  String get digestNone;
+
+  /// No description provided for @digestHanging.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} things hanging'**
+  String digestHanging(Object count);
+
+  /// No description provided for @digestChase.
+  ///
+  /// In en, this message translates to:
+  /// **', {count} to chase today'**
+  String digestChase(Object count);
+
+  /// No description provided for @settingsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get settingsTitle;
 }
 
 class _AppLocalizationsDelegate

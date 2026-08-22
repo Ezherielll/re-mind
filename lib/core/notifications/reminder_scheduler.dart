@@ -11,8 +11,13 @@ abstract class ReminderScheduler {
 
   Future<void> cancelItemAlert(int loopId);
 
-  /// Repeating daily check-in at the user's chosen time.
-  Future<void> scheduleDailyDigest({required int hour, required int minute});
+  /// Repeating daily check-in at the user's chosen time. [body] is composed
+  /// from live data at schedule time and refreshed on every sync.
+  Future<void> scheduleDailyDigest({
+    required int hour,
+    required int minute,
+    String? body,
+  });
 
   /// Runtime notification permission (Android 13+). Called contextually by
   /// the onboarding flow (T09), never at first launch.

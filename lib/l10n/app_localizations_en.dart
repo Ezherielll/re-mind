@@ -137,4 +137,23 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get reopen => 'Reopen';
+
+  @override
+  String get dailyCheckIn => 'Daily check-in';
+
+  @override
+  String get digestNone => 'All clear — nothing hanging.';
+
+  @override
+  String digestHanging(Object count) {
+    return '$count things hanging';
+  }
+
+  @override
+  String digestChase(Object count) {
+    return ', $count to chase today';
+  }
+
+  @override
+  String get settingsTitle => 'Settings';
 }
