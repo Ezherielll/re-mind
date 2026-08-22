@@ -134,8 +134,10 @@ void main() {
     await tester.tap(find.text('Done'));
     await settleRealAsync(tester);
 
-    final archived = await repository.watchArchivedLoops().first;
-    expect(archived.single.commitment.status, CommitmentStatus.done);
+    final archived = await tester.runAsync(
+      () => repository.watchArchivedLoops().first,
+    );
+    expect(archived!.single.commitment.status, CommitmentStatus.done);
     await drainStreams(tester);
   });
 
