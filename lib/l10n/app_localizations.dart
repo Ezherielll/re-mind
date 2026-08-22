@@ -417,6 +417,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No matches'**
   String get noMatches;
+
+  /// No description provided for @historyLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'History'**
+  String get historyLabel;
+
+  /// No description provided for @archivedLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Archived'**
+  String get archivedLabel;
 }
 
 class _AppLocalizationsDelegate

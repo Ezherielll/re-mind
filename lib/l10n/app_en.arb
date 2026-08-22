@@ -53,5 +53,7 @@
   "searchHint": "Search commitments and people",
   "searchPeople": "People",
   "searchLoopsLabel": "Loops",
-  "noMatches": "No matches"
+  "noMatches": "No matches",
+  "historyLabel": "History",
+  "archivedLabel": "Archived"
 }

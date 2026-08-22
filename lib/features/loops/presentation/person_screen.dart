@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/domain/derived_status.dart';
 import '../../../l10n/app_localizations.dart';
+import '../data/loops_repository.dart';
 import '../data/providers.dart';
 import 'widgets/loop_row.dart';
 
@@ -99,15 +100,46 @@ class PersonScreen extends ConsumerWidget {
                           ),
                         );
                       }
+
                       return ListView.separated(
                         padding: const EdgeInsets.only(
                           left: 16,
                           right: 16,
                           bottom: 32,
                         ),
-                        itemCount: loops.length,
+                        itemCount: loops.length + 1,
                         separatorBuilder: (_, _) => const Divider(height: 1),
                         itemBuilder: (context, index) {
+                          if (index == loops.length) {
+                            return StreamBuilder<List<LoopWithPerson>>(
+                              stream:
+                                  repository.watchDoneLoopsByPerson(personId),
+                              builder: (context, snap2) {
+                                final done = snap2.data ?? const [];
+                                if (done.isEmpty) {
+                                  return const SizedBox.shrink();
+                                }
+                                return ExpansionTile(
+                                  tilePadding: EdgeInsets.zero,
+                                  title: Text(
+                                    '${l10n.archivedLabel} · ${done.length}',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .labelMedium
+                                        ?.copyWith(
+                                            fontWeight: FontWeight.w600),
+                                  ),
+                                  children: [
+                                    for (final item in done)
+                                      LoopRow(
+                                          item: item,
+                                          status:
+                                              DerivedStatus.onTrack),
+                                  ],
+                                );
+                              },
+                            );
+                          }
                           final item = loops[index];
                           return LoopRow(
                             item: item,

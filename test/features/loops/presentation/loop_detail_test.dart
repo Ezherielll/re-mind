@@ -52,6 +52,7 @@ void main() {
     // Row refreshed out of the empty state; person row shows Budi.
     expect(find.text('No due date'), findsNothing);
     expect(find.text('Budi'), findsOneWidget);
+    await drainStreams(tester);
   });
 
   testWidgets('reminder row opens picker and persists follow-up', (
@@ -114,6 +115,7 @@ void main() {
     expect(stored.followUpAt, due);
     final events = await db.select(db.loopEvents).get();
     expect(events.map((e) => e.type), contains(LoopEventType.followedUp));
+    await drainStreams(tester);
   });
 
   testWidgets('Done archives the loop and pops back', (tester) async {

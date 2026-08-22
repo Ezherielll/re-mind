@@ -63,6 +63,9 @@ abstract class LoopsRepository {
   /// Un-archives a loop back to open.
   Future<void> reopenLoop(int id);
 
+  /// Ordered event timeline for one commitment (T11 history).
+  Stream<List<LoopEvent>> watchEvents(int commitmentId);
+
   /// Done loops for one person (person view "closed" side).
   Stream<List<LoopWithPerson>> watchDoneLoopsByPerson(int personId);
 
@@ -212,9 +215,16 @@ class DriftLoopsRepository implements LoopsRepository {
 
   @override
   Future<LoopWithPerson?> getLoop(int id) async {
-    final rows = await _openLoopsQuery(
-      extraWhere: _db.commitments.id.equals(id),
-    ).get();
+    // Archive-aware (T11): done loops stay openable from history/person view.
+    final query = _db.select(_db.commitments).join([
+      leftOuterJoin(
+        _db.people,
+        _db.people.id.equalsExp(_db.commitments.personId),
+      ),
+    ])
+      ..where(_db.commitments.deletedAt.isNull())
+      ..where(_db.commitments.id.equals(id));
+    final rows = await query.get();
     if (rows.isEmpty) return null;
     return LoopWithPerson.fromRow(_db, rows.first);
   }
@@ -308,6 +318,13 @@ class DriftLoopsRepository implements LoopsRepository {
   @override
   Stream<List<LoopWithPerson>> watchArchivedLoops() =>
       _watchStatus(onlyOpen: false);
+  @override
+  Stream<List<LoopEvent>> watchEvents(int commitmentId) {
+    return (_db.select(_db.loopEvents)
+          ..where((e) => e.commitmentId.equals(commitmentId))
+          ..orderBy([(e) => OrderingTerm.asc(e.occurredAt)]))
+        .watch();
+  }
 
   @override
   Future<void> updateNote(int id, String? note) {

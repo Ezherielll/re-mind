@@ -183,4 +183,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get noMatches => 'No matches';
+
+  @override
+  String get historyLabel => 'History';
+
+  @override
+  String get archivedLabel => 'Archived';
 }

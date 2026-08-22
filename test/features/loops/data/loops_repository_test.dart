@@ -305,4 +305,40 @@ void main() {
       expect(open.single.commitment.id, loop.id);
     });
   });
+
+  group('history & archive-aware fetch', () {
+    Future<Commitment> seed() => repository.createCommitment(
+          title: 'Send revision',
+          direction: Direction.outgoing,
+        );
+
+    test('getLoop returns done loops when fetched by id', () async {
+      final loop = await seed();
+      await repository.markDone(loop.id);
+
+      final fetched = await repository.getLoop(loop.id);
+      expect(fetched, isNotNull);
+      expect(fetched!.commitment.status, CommitmentStatus.done);
+    });
+
+    test('watchEvents streams ordered events per commitment', () async {
+      final loop = await seed();
+      await repository.markFollowedUp(
+        loop.id,
+        nextNudgeAt: DateTime(2026, 9, 1, 9),
+      );
+      await repository.markDone(loop.id);
+
+      final emissions = <List<LoopEvent>>[];
+      final sub = repository.watchEvents(loop.id).listen(emissions.add);
+      addTearDown(sub.cancel);
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+
+      expect(emissions.last.map((e) => e.type).toList(), [
+        LoopEventType.created,
+        LoopEventType.followedUp,
+        LoopEventType.done,
+      ]);
+    });
+  });
 }

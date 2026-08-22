@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
+import '../../../core/db/app_database.dart';
 import '../../../core/domain/commitment.dart';
 import '../../../l10n/app_localizations.dart';
 import '../data/loops_repository.dart';
@@ -295,6 +296,59 @@ class _LoopDetailScreenState extends ConsumerState<LoopDetailScreen> {
                             border: const OutlineInputBorder(),
                             hintText: l10n.noteHint,
                           ),
+                        ),                        const SizedBox(height: 16),
+                        Text(
+                          l10n.historyLabel.toUpperCase(),
+                          style:
+                              Theme.of(context).textTheme.labelMedium?.copyWith(
+                                fontWeight: FontWeight.w600,
+                                letterSpacing: 0.05,
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onSurfaceVariant,
+                              ),
+                        ),
+                        const SizedBox(height: 4),
+                        StreamBuilder<List<LoopEvent>>(
+                          stream: ref
+                              .read(loopsRepositoryProvider)
+                              .watchEvents(widget.loopId),
+                          builder: (context, snap) {
+                            final events = snap.data ?? const <LoopEvent>[];
+                            if (events.isEmpty) {
+                              return const SizedBox.shrink();
+                            }
+                            return Column(
+                              children: [
+                                for (final e in events)
+                                  ListTile(
+                                    dense: true,
+                                    contentPadding: EdgeInsets.zero,
+                                    leading: Icon(switch (e.type) {
+                                      LoopEventType.created =>
+                                        Icons.add_circle_outline,
+                                      LoopEventType.followedUp =>
+                                        Icons.send_outlined,
+                                      LoopEventType.done =>
+                                        Icons.check_circle_outline,
+                                    }),
+                                    title: Text(switch (e.type) {
+                                      LoopEventType.created => 'Created',
+                                      LoopEventType.followedUp =>
+                                        'Followed up',
+                                      LoopEventType.done => 'Done',
+                                    }),
+                                    trailing: Text(
+                                      DateFormat('d MMM, HH:mm')
+                                          .format(e.occurredAt),
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodySmall,
+                                    ),
+                                  ),
+                              ],
+                            );
+                          },
                         ),
                       ],
                     ),
