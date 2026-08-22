@@ -136,6 +136,7 @@ void main() {
 
     final archived = await repository.watchArchivedLoops().first;
     expect(archived.single.commitment.status, CommitmentStatus.done);
+    await drainStreams(tester);
   });
 
   testWidgets('Snooze sheet pushes the nudge one day', (tester) async {
@@ -159,5 +160,6 @@ void main() {
     final stored = (await repository.getLoop(loop.id))!.commitment;
     expect(stored.followUpAt, isNotNull);
     expect(stored.followUpAt!.hour, 9);
+    await drainStreams(tester);
   });
 }
