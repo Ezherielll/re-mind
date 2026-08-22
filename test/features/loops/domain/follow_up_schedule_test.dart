@@ -9,19 +9,13 @@ void main() {
 
   group('computeSchedule', () {
     test('incoming with no input defaults to +3 days at 09:00', () {
-      final plan = computeSchedule(
-        direction: Direction.incoming,
-        now: monday,
-      );
+      final plan = computeSchedule(direction: Direction.incoming, now: monday);
       expect(plan.dueDate, isNull);
       expect(plan.followUpAt, at9(8, 27)); // Thursday
     });
 
     test('outgoing without a due date defaults to +3 days at 09:00', () {
-      final plan = computeSchedule(
-        direction: Direction.outgoing,
-        now: monday,
-      );
+      final plan = computeSchedule(direction: Direction.outgoing, now: monday);
       expect(plan.followUpAt, at9(8, 27));
     });
 

@@ -103,4 +103,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get statusOnTrack => 'On track';
+
+  @override
+  String groupCount(Object count) {
+    return '· $count';
+  }
 }

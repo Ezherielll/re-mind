@@ -46,10 +46,7 @@ class PersonScreen extends ConsumerWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Row(
                     children: [
-                      CircleAvatar(
-                        radius: 28,
-                        child: Text(initials),
-                      ),
+                      CircleAvatar(radius: 28, child: Text(initials)),
                       const SizedBox(width: 16),
                       Expanded(
                         child: Column(
@@ -57,25 +54,22 @@ class PersonScreen extends ConsumerWidget {
                           children: [
                             Text(
                               person.name,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .titleLarge
+                              style: Theme.of(context).textTheme.titleLarge
                                   ?.copyWith(fontWeight: FontWeight.w600),
                             ),
                             StreamBuilder(
-                              stream:
-                                  repository.watchOpenLoopsByPerson(personId),
+                              stream: repository.watchOpenLoopsByPerson(
+                                personId,
+                              ),
                               builder: (context, snap) {
                                 final count = snap.data?.length ?? 0;
                                 return Text(
                                   l10n.personOpenCount(count),
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .bodyMedium
+                                  style: Theme.of(context).textTheme.bodyMedium
                                       ?.copyWith(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .onSurfaceVariant,
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.onSurfaceVariant,
                                       ),
                                 );
                               },
@@ -96,12 +90,12 @@ class PersonScreen extends ConsumerWidget {
                         return Center(
                           child: Text(
                             l10n.personNothingPending(person.name),
-                            style:
-                                Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onSurfaceVariant,
-                                    ),
+                            style: Theme.of(context).textTheme.bodyMedium
+                                ?.copyWith(
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onSurfaceVariant,
+                                ),
                           ),
                         );
                       }

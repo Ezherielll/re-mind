@@ -24,8 +24,9 @@ void main() {
     await settleRealAsync(tester);
   }
 
-  testWidgets('shows header and only that person\'s open loops',
-      (tester) async {
+  testWidgets('shows header and only that person\'s open loops', (
+    tester,
+  ) async {
     final repository = DriftLoopsRepository(db);
     final budi = await repository.findOrCreatePerson('Budi Santoso');
     await repository.createCommitment(

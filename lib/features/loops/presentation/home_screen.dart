@@ -19,8 +19,9 @@ class DirectionFilter extends Notifier<Direction?> {
   void set(Direction? direction) => state = direction;
 }
 
-final directionFilterProvider =
-    NotifierProvider<DirectionFilter, Direction?>(DirectionFilter.new);
+final directionFilterProvider = NotifierProvider<DirectionFilter, Direction?>(
+  DirectionFilter.new,
+);
 
 /// Home screen: the single prioritized open-loop list (page spec:
 /// design-system/re-mind/pages/home.md). Grouped by derived status via
@@ -32,6 +33,7 @@ class HomeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final loops = ref.watch(openLoopsProvider);
+    final totalOpen = loops.value?.length ?? 0;
     return Scaffold(
       body: SafeArea(
         child: Padding(
@@ -41,42 +43,68 @@ class HomeScreen extends ConsumerWidget {
             children: [
               const SizedBox(height: 24),
               Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Text(
                     l10n.homeTitle,
-                    style:
-                        Theme.of(context).textTheme.headlineMedium?.copyWith(
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: -0.02,
-                            ),
+                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: -0.02,
+                    ),
                   ),
+                  if (totalOpen > 0) ...[
+                    const SizedBox(width: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 2,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onSurfaceVariant.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(999),
+                      ),
+                      child: Text(
+                        '$totalOpen',
+                        style: Theme.of(context).textTheme.labelMedium,
+                      ),
+                    ),
+                  ],
                 ],
               ),
               const SizedBox(height: 8),
               _FilterChips(),
               Expanded(
-                child: loops.when(
-                  loading: () => const SizedBox.shrink(),
-                  error: (_, _) => Center(
-                    child: Text(
-                      l10n.homeError,
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color:
-                                Theme.of(context).colorScheme.onSurfaceVariant,
-                          ),
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 200),
+                  child: KeyedSubtree(
+                    key: ValueKey(totalOpen),
+                    child: loops.when(
+                      loading: () => const SizedBox.shrink(),
+                      error: (_, _) => Center(
+                        child: Text(
+                          l10n.homeError,
+                          style: Theme.of(context).textTheme.bodyMedium
+                              ?.copyWith(
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.onSurfaceVariant,
+                              ),
+                        ),
+                      ),
+                      data: (items) {
+                        final groups = groupOpenLoops(
+                          items,
+                          directionFilter: ref.watch(directionFilterProvider),
+                          now: DateTime.now(),
+                        );
+                        if (groups.isEmpty) {
+                          return const _EmptyState();
+                        }
+                        return _GroupedList(groups);
+                      },
                     ),
                   ),
-                  data: (items) {
-                    final groups = groupOpenLoops(
-                      items,
-                      directionFilter: ref.watch(directionFilterProvider),
-                    );
-                    if (groups.isEmpty) {
-                      return const _EmptyState();
-                    }
-                    return _GroupedList(groups);
-                  },
                 ),
               ),
             ],
@@ -138,7 +166,6 @@ class _FilterChips extends ConsumerWidget {
       label: Text(label),
       selected: selected,
       onSelected: (_) => onSelected(),
-      visualDensity: VisualDensity.compact,
     );
   }
 }
@@ -177,24 +204,28 @@ class _GroupedList extends StatelessWidget {
   Widget build(BuildContext context) {
     final children = <Widget>[];
     for (final group in groups) {
-      children.add(_GroupHeader(status: group.status, count: group.loops.length));
+      children.add(
+        _GroupHeader(status: group.status, count: group.loops.length),
+      );
       for (final item in group.loops) {
-        children.add(LoopRow(
-          item: item,
-          status: group.status,
-          onTap: () => Navigator.of(context).push(
-            MaterialPageRoute<void>(
-              builder: (_) => LoopDetailScreen(loopId: item.commitment.id),
+        children.add(
+          LoopRow(
+            item: item,
+            status: group.status,
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                builder: (_) => LoopDetailScreen(loopId: item.commitment.id),
+              ),
             ),
-          ),
-          onTapPerson: item.person == null
-              ? null
-              : (person) => Navigator.of(context).push(
+            onTapPerson: item.person == null
+                ? null
+                : (person) => Navigator.of(context).push(
                     MaterialPageRoute<void>(
                       builder: (_) => PersonScreen(personId: person.id),
                     ),
                   ),
-        ));
+          ),
+        );
         children.add(const Divider(height: 1));
       }
       children.add(const SizedBox(height: 16));
@@ -228,17 +259,17 @@ class _GroupHeader extends StatelessWidget {
           Text(
             label.toUpperCase(),
             style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: 0.05,
-                  color: statusColor(context, status),
-                ),
+              fontWeight: FontWeight.w600,
+              letterSpacing: 0.05,
+              color: statusColor(context, status),
+            ),
           ),
           const SizedBox(width: 6),
           Text(
-            '· $count',
+            l10n.groupCount(count),
             style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                ),
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
           ),
         ],
       ),

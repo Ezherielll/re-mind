@@ -14,23 +14,20 @@ class LoopGroup {
 
 /// Groups open loops by derived status in fixed precedence order
 /// (pages/home.md). Empty groups are omitted; [directionFilter] narrows to
-/// one Direction when set. Pure: inject [now].
+/// one Direction when set. Pure: [now] is injected by the caller.
 List<LoopGroup> groupOpenLoops(
   Iterable<LoopWithPerson> loops, {
   Direction? directionFilter,
-  DateTime? now,
+  required DateTime now,
 }) {
-  final effectiveNow = now ?? DateTime.now();
   final filtered = directionFilter == null
-      ? loops.where((l) => true)
+      ? loops
       : loops.where((l) => l.commitment.direction == directionFilter);
 
-  final buckets = {
-    for (final s in DerivedStatus.values) s: <LoopWithPerson>[],
-  };
+  final buckets = {for (final s in DerivedStatus.values) s: <LoopWithPerson>[]};
   for (final loop in filtered) {
     final status = deriveStatus(
-      now: effectiveNow,
+      now: now,
       followUpAt: loop.commitment.followUpAt,
       dueDate: loop.commitment.dueDate,
     );

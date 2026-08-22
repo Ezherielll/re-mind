@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:re_mind/core/db/app_database.dart';
 import 'package:re_mind/core/domain/commitment.dart';
@@ -16,8 +15,9 @@ void main() {
   });
   tearDown(() => db.close());
 
-  testWidgets('home renders groups in derived-status precedence order',
-      (tester) async {
+  testWidgets('home renders groups in derived-status precedence order', (
+    tester,
+  ) async {
     final budi = await repository.findOrCreatePerson('Budi');
     // Follow-up due (incoming).
     await repository.createCommitment(

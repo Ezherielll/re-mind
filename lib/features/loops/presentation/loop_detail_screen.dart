@@ -38,7 +38,9 @@ class _LoopDetailScreenState extends ConsumerState<LoopDetailScreen> {
     final l10n = AppLocalizations.of(context);
     final loop = _loop;
     if (loop == null) return;
-    final current = isDue ? loop.commitment.dueDate : loop.commitment.followUpAt;
+    final current = isDue
+        ? loop.commitment.dueDate
+        : loop.commitment.followUpAt;
     final picked = await showDatePicker(
       context: context,
       initialDate: current ?? DateTime.now(),
@@ -47,7 +49,9 @@ class _LoopDetailScreenState extends ConsumerState<LoopDetailScreen> {
     );
     if (picked == null || !mounted) return;
     final atNine = DateTime(picked.year, picked.month, picked.day, 9);
-    await ref.read(loopsRepositoryProvider).updateDates(
+    await ref
+        .read(loopsRepositoryProvider)
+        .updateDates(
           widget.loopId,
           dueDate: isDue ? atNine : loop.commitment.dueDate,
           followUpAt: isDue ? loop.commitment.followUpAt : atNine,
@@ -86,8 +90,7 @@ class _LoopDetailScreenState extends ConsumerState<LoopDetailScreen> {
                         Row(
                           children: [
                             Icon(
-                              loop.commitment.direction ==
-                                      Direction.outgoing
+                              loop.commitment.direction == Direction.outgoing
                                   ? Icons.north_east
                                   : Icons.south_west,
                               size: 22,
@@ -96,9 +99,7 @@ class _LoopDetailScreenState extends ConsumerState<LoopDetailScreen> {
                             Expanded(
                               child: Text(
                                 loop.commitment.title,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .titleLarge
+                                style: Theme.of(context).textTheme.titleLarge
                                     ?.copyWith(fontWeight: FontWeight.w600),
                               ),
                             ),
@@ -122,8 +123,8 @@ class _LoopDetailScreenState extends ConsumerState<LoopDetailScreen> {
                                           .updateDates(
                                             widget.loopId,
                                             dueDate: null,
-                                            followUpAt: loop
-                                                .commitment.followUpAt,
+                                            followUpAt:
+                                                loop.commitment.followUpAt,
                                           );
                                       await _reload();
                                     },
@@ -143,12 +144,10 @@ class _LoopDetailScreenState extends ConsumerState<LoopDetailScreen> {
                                 icon: Icons.person_outline,
                                 label: loop.person!.name,
                                 value: '',
-                                onTap: () =>
-                                    Navigator.of(context).push(
+                                onTap: () => Navigator.of(context).push(
                                   MaterialPageRoute<void>(
-                                    builder: (_) => PersonScreen(
-                                      personId: loop.person!.id,
-                                    ),
+                                    builder: (_) =>
+                                        PersonScreen(personId: loop.person!.id),
                                   ),
                                 ),
                               ),
@@ -219,8 +218,8 @@ class _MetaRow extends StatelessWidget {
               Text(
                 value,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    ),
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
               ),
             if (onClear != null)
               IconButton(

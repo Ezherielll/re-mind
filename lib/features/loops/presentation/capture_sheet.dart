@@ -6,7 +6,9 @@ import '../../../core/db/app_database.dart';
 import '../../../core/domain/commitment.dart';
 import '../../../l10n/app_localizations.dart';
 import '../data/providers.dart';
-import '../domain/follow_up_schedule.dart';/// Capture flow (page spec: design-system/re-mind/pages/capture.md).
+import '../domain/follow_up_schedule.dart';
+
+/// Capture flow (page spec: design-system/re-mind/pages/capture.md).
 /// T04 adds the optional due-date row, reminder chips, and the live
 /// explainer line. Save computes the plan via [computeSchedule].
 enum _Reminder { standard, tomorrow, in3Days, onDue, custom }
@@ -50,8 +52,9 @@ class _CaptureSheetState extends ConsumerState<CaptureSheet> {
       if (mounted) setState(() => _suggestions = const []);
       return;
     }
-    final results =
-        await ref.read(loopsRepositoryProvider).searchPeople(trimmed);
+    final results = await ref
+        .read(loopsRepositoryProvider)
+        .searchPeople(trimmed);
     if (mounted) setState(() => _suggestions = results);
   }
 
@@ -63,10 +66,8 @@ class _CaptureSheetState extends ConsumerState<CaptureSheet> {
       dueDate: _dueDate,
       followUpAt: switch (_reminder) {
         _Reminder.standard => null,
-        _Reminder.tomorrow =>
-          atReminderHour(now.add(const Duration(days: 1))),
-        _Reminder.in3Days =>
-          atReminderHour(now.add(const Duration(days: 3))),
+        _Reminder.tomorrow => atReminderHour(now.add(const Duration(days: 1))),
+        _Reminder.in3Days => atReminderHour(now.add(const Duration(days: 3))),
         _Reminder.onDue => _dueDate,
         _Reminder.custom => _customFollowUp,
       },
@@ -189,9 +190,8 @@ class _CaptureSheetState extends ConsumerState<CaptureSheet> {
                   Text(
                     _dueDate == null ? l10n.noDueDate : _fmt(_dueDate!),
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color:
-                              Theme.of(context).colorScheme.onSurfaceVariant,
-                        ),
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
                   ),
                   IconButton(
                     visualDensity: VisualDensity.compact,
@@ -244,8 +244,8 @@ class _CaptureSheetState extends ConsumerState<CaptureSheet> {
               child: Text(
                 l10n.remindExplainer(_fmt(plan!.followUpAt!)),
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    ),
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
               ),
             ),
           const SizedBox(height: 16),

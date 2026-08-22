@@ -29,5 +29,6 @@
   "statusFollowUpDue": "Follow-up due",
   "statusDue": "Due",
   "statusUpcoming": "Upcoming",
-  "statusOnTrack": "On track"
+  "statusOnTrack": "On track",
+  "groupCount": "· {count}"
 }

@@ -16,8 +16,9 @@ void main() {
   });
   tearDown(() => db.close());
 
-  testWidgets('due date row opens picker and persists the picked date',
-      (tester) async {
+  testWidgets('due date row opens picker and persists the picked date', (
+    tester,
+  ) async {
     final budi = await repository.findOrCreatePerson('Budi');
     final loop = await repository.createCommitment(
       title: 'Send revision',
@@ -53,8 +54,9 @@ void main() {
     expect(find.text('Budi'), findsOneWidget);
   });
 
-  testWidgets('reminder row opens picker and persists follow-up', 
-      (tester) async {
+  testWidgets('reminder row opens picker and persists follow-up', (
+    tester,
+  ) async {
     final loop = await repository.createCommitment(
       title: 'Awaiting data',
       direction: Direction.incoming,

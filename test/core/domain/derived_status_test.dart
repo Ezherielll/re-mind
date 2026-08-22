@@ -45,10 +45,7 @@ void main() {
     });
 
     test('overdue (yesterday) is Due', () {
-      expect(
-        deriveStatus(now: now, dueDate: d(8, 25)),
-        DerivedStatus.due,
-      );
+      expect(deriveStatus(now: now, dueDate: d(8, 25)), DerivedStatus.due);
     });
 
     test('future due date is Upcoming even with future follow-up', () {
@@ -73,20 +70,13 @@ void main() {
       expect(deriveStatus(now: now), DerivedStatus.onTrack);
     });
 
-    test('first second of today is Due; first second of tomorrow is not',
-        () {
+    test('first second of today is Due; first second of tomorrow is not', () {
       expect(
-        deriveStatus(
-          now: now,
-          dueDate: DateTime(2026, 8, 26, 0, 0, 0),
-        ),
+        deriveStatus(now: now, dueDate: DateTime(2026, 8, 26, 0, 0, 0)),
         DerivedStatus.due,
       );
       expect(
-        deriveStatus(
-          now: now,
-          dueDate: DateTime(2026, 8, 27, 0, 0, 0),
-        ),
+        deriveStatus(now: now, dueDate: DateTime(2026, 8, 27, 0, 0, 0)),
         DerivedStatus.upcoming,
       );
     });

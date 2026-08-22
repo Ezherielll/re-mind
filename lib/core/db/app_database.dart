@@ -23,17 +23,17 @@ class AppDatabase extends _$AppDatabase {
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
-        onCreate: (m) => m.createAll(),
-        // Versioned from release 1 (ADR-0001): every schema bump adds a step
-        // here and a drift schema snapshot for migration tests.
-        onUpgrade: (m, from, to) async {},
-      );
+    onCreate: (m) => m.createAll(),
+    // Versioned from release 1 (ADR-0001): every schema bump adds a step
+    // here and a drift schema snapshot for migration tests.
+    onUpgrade: (m, from, to) async {},
+  );
 
   static LazyDatabase _openConnection() => LazyDatabase(() async {
-        final dir = await getApplicationDocumentsDirectory();
-        final file = File(p.join(dir.path, 're_mind.sqlite'));
-        return NativeDatabase.createInBackground(file);
-      });
+    final dir = await getApplicationDocumentsDirectory();
+    final file = File(p.join(dir.path, 're_mind.sqlite'));
+    return NativeDatabase.createInBackground(file);
+  });
 }
 
 /// One hanging commitment between the user and another person.
@@ -45,9 +45,7 @@ class Commitments extends Table {
   TextColumn get title => text()();
   TextColumn get direction => textEnum<Direction>()();
   TextColumn get status => textEnum<CommitmentStatus>()();
-  IntColumn get personId => integer()
-      .nullable()
-      .references(People, #id)();
+  IntColumn get personId => integer().nullable().references(People, #id)();
   DateTimeColumn get dueDate => dateTime().nullable()();
   DateTimeColumn get followUpAt => dateTime().nullable()();
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
@@ -58,8 +56,7 @@ class Commitments extends Table {
 /// Append-only history of state transitions (created / followed up / done).
 class LoopEvents extends Table {
   IntColumn get id => integer().autoIncrement()();
-  IntColumn get commitmentId =>
-      integer().references(Commitments, #id)();
+  IntColumn get commitmentId => integer().references(Commitments, #id)();
   TextColumn get type => textEnum<LoopEventType>()();
   DateTimeColumn get occurredAt => dateTime().withDefault(currentDateAndTime)();
 }

@@ -273,6 +273,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'On track'**
   String get statusOnTrack;
+
+  /// No description provided for @groupCount.
+  ///
+  /// In en, this message translates to:
+  /// **'· {count}'**
+  String groupCount(Object count);
 }
 
 class _AppLocalizationsDelegate

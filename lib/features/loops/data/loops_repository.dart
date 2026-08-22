@@ -10,10 +10,7 @@ class LoopWithPerson {
 
   const LoopWithPerson(this.commitment, this.person);
 
-  static LoopWithPerson fromRow(
-    AppDatabase db,
-    TypedResult row,
-  ) =>
+  static LoopWithPerson fromRow(AppDatabase db, TypedResult row) =>
       LoopWithPerson(
         row.readTable(db.commitments),
         row.readTableOrNull(db.people),
@@ -46,11 +43,7 @@ abstract class LoopsRepository {
   });
 
   /// Re-plans a loop's dates (T04); bumps `updatedAt`.
-  Future<void> updateDates(
-    int id, {
-    DateTime? dueDate,
-    DateTime? followUpAt,
-  });
+  Future<void> updateDates(int id, {DateTime? dueDate, DateTime? followUpAt});
 
   /// One-shot fetch of a loop with its person for the detail screen.
   Future<LoopWithPerson?> getLoop(int id);
@@ -65,14 +58,15 @@ class DriftLoopsRepository implements LoopsRepository {
       raw.trim().toLowerCase().replaceAll(RegExp(r'\s+'), ' ');
 
   JoinedSelectStatement _openLoopsQuery({Expression<bool>? extraWhere}) {
-    final query = _db.select(_db.commitments).join([
-      leftOuterJoin(
-        _db.people,
-        _db.people.id.equalsExp(_db.commitments.personId),
-      ),
-    ])
-      ..where(_db.commitments.status.equalsValue(CommitmentStatus.open))
-      ..where(_db.commitments.deletedAt.isNull());
+    final query =
+        _db.select(_db.commitments).join([
+            leftOuterJoin(
+              _db.people,
+              _db.people.id.equalsExp(_db.commitments.personId),
+            ),
+          ])
+          ..where(_db.commitments.status.equalsValue(CommitmentStatus.open))
+          ..where(_db.commitments.deletedAt.isNull());
     if (extraWhere != null) {
       query.where(extraWhere);
     }
@@ -82,9 +76,9 @@ class DriftLoopsRepository implements LoopsRepository {
 
   @override
   Stream<List<LoopWithPerson>> watchOpenLoops() {
-    return _openLoopsQuery()
-        .watch()
-        .map((rows) => rows.map((row) => LoopWithPerson.fromRow(_db, row)).toList());
+    return _openLoopsQuery().watch().map(
+      (rows) => rows.map((row) => LoopWithPerson.fromRow(_db, row)).toList(),
+    );
   }
 
   @override
@@ -92,29 +86,29 @@ class DriftLoopsRepository implements LoopsRepository {
     return _openLoopsQuery(
       extraWhere: _db.commitments.personId.equals(personId),
     ).watch().map(
-          (rows) => rows
-              .map((row) => LoopWithPerson.fromRow(_db, row))
-              .toList(),
-        );
+      (rows) => rows.map((row) => LoopWithPerson.fromRow(_db, row)).toList(),
+    );
   }
 
   @override
   Future<Person> getPerson(int id) {
-    return (_db.select(_db.people)..where((p) => p.id.equals(id)))
-        .getSingle();
+    return (_db.select(_db.people)..where((p) => p.id.equals(id))).getSingle();
   }
 
   @override
   Future<Person> findOrCreatePerson(String rawName) {
     final normalized = _normalize(rawName);
     return _db.transaction(() async {
-      final existing = await (_db.select(_db.people)
-            ..where((p) => p.normalizedName.equals(normalized))
-            ..where((p) => p.deletedAt.isNull()))
-          .getSingleOrNull();
+      final existing =
+          await (_db.select(_db.people)
+                ..where((p) => p.normalizedName.equals(normalized))
+                ..where((p) => p.deletedAt.isNull()))
+              .getSingleOrNull();
       if (existing != null) return existing;
 
-      return _db.into(_db.people).insertReturning(
+      return _db
+          .into(_db.people)
+          .insertReturning(
             PeopleCompanion.insert(
               name: rawName.trim(),
               normalizedName: normalized,
@@ -156,7 +150,12 @@ class DriftLoopsRepository implements LoopsRepository {
           );
       await _db
           .into(_db.loopEvents)
-          .insert(LoopEventsCompanion.insert(commitmentId: commitment.id, type: LoopEventType.created));
+          .insert(
+            LoopEventsCompanion.insert(
+              commitmentId: commitment.id,
+              type: LoopEventType.created,
+            ),
+          );
       return commitment;
     });
   }

@@ -28,12 +28,14 @@ abstract final class AppTheme {
     return ThemeData(
       useMaterial3: true,
       colorScheme: scheme,
-      scaffoldBackgroundColor:
-          isDark ? AppColors.backgroundDark : AppColors.backgroundLight,
+      scaffoldBackgroundColor: isDark
+          ? AppColors.backgroundDark
+          : AppColors.backgroundLight,
       fontFamily: AppTheme.fontFamily,
       appBarTheme: AppBarTheme(
-        backgroundColor:
-            isDark ? AppColors.backgroundDark : AppColors.backgroundLight,
+        backgroundColor: isDark
+            ? AppColors.backgroundDark
+            : AppColors.backgroundLight,
         elevation: 0,
         scrolledUnderElevation: 0,
         centerTitle: false,
@@ -41,9 +43,7 @@ abstract final class AppTheme {
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
           minimumSize: const Size(52, 52),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
       ),
       floatingActionButtonTheme: const FloatingActionButtonThemeData(

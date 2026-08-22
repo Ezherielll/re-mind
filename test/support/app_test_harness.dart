@@ -20,17 +20,12 @@ Future<void> pumpApp(WidgetTester tester, AppDatabase db) async {
   final container = ProviderContainer(
     overrides: [
       databaseProvider.overrideWithValue(db),
-      loopsRepositoryProvider.overrideWith(
-        (ref) => DriftLoopsRepository(db),
-      ),
+      loopsRepositoryProvider.overrideWith((ref) => DriftLoopsRepository(db)),
     ],
   );
   addTearDown(container.dispose);
   await tester.pumpWidget(
-    UncontrolledProviderScope(
-      container: container,
-      child: const ReMindApp(),
-    ),
+    UncontrolledProviderScope(container: container, child: const ReMindApp()),
   );
   await tester.pumpAndSettle();
 }
@@ -67,9 +62,7 @@ Future<void> pumpScreen(
   final container = ProviderContainer(
     overrides: [
       databaseProvider.overrideWithValue(db),
-      loopsRepositoryProvider.overrideWith(
-        (ref) => DriftLoopsRepository(db),
-      ),
+      loopsRepositoryProvider.overrideWith((ref) => DriftLoopsRepository(db)),
     ],
   );
   addTearDown(container.dispose);

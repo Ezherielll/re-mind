@@ -10,38 +10,31 @@ LoopWithPerson _loop({
   Direction direction = Direction.outgoing,
   DateTime? dueDate,
   DateTime? followUpAt,
-}) =>
-    LoopWithPerson(
-      Commitment(
-        id: id,
-        title: 'loop $id',
-        direction: direction,
-        status: CommitmentStatus.open,
-        dueDate: dueDate,
-        followUpAt: followUpAt,
-        createdAt: DateTime(2026, 8, 20),
-        updatedAt: DateTime(2026, 8, 20),
-      ),
-      null,
-    );
+}) => LoopWithPerson(
+  Commitment(
+    id: id,
+    title: 'loop $id',
+    direction: direction,
+    status: CommitmentStatus.open,
+    dueDate: dueDate,
+    followUpAt: followUpAt,
+    createdAt: DateTime(2026, 8, 20),
+    updatedAt: DateTime(2026, 8, 20),
+  ),
+  null,
+);
 
 void main() {
   // Wednesday, 2026-08-26 10:00 local.
   final now = DateTime(2026, 8, 26, 10);
 
   test('groups appear in precedence order and empty groups are omitted', () {
-    final groups = groupOpenLoops(
-      [
-        _loop(id: 1), // on track
-        _loop(id: 2, dueDate: DateTime(2026, 9, 1)), // upcoming
-        _loop(
-          id: 3,
-          followUpAt: DateTime(2026, 8, 25),
-        ), // follow-up due
-        _loop(id: 4, dueDate: DateTime(2026, 8, 26)), // due today
-      ],
-      now: now,
-    );
+    final groups = groupOpenLoops([
+      _loop(id: 1), // on track
+      _loop(id: 2, dueDate: DateTime(2026, 9, 1)), // upcoming
+      _loop(id: 3, followUpAt: DateTime(2026, 8, 25)), // follow-up due
+      _loop(id: 4, dueDate: DateTime(2026, 8, 26)), // due today
+    ], now: now);
 
     expect(groups.map((g) => g.status).toList(), [
       DerivedStatus.followUpDue,

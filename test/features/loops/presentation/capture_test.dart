@@ -14,14 +14,18 @@ void main() {
   });
   tearDown(() => db.close());
 
-  testWidgets('capture save path persists a loop and shows it on home',
-      (tester) async {
+  testWidgets('capture save path persists a loop and shows it on home', (
+    tester,
+  ) async {
     await pumpApp(tester, db);
 
     await tester.tap(find.byType(FloatingActionButton));
     await tester.pumpAndSettle();
 
-    await tester.enterText(find.byType(TextField).first, 'Send revision to Budi');
+    await tester.enterText(
+      find.byType(TextField).first,
+      'Send revision to Budi',
+    );
     final personField = find.byType(TextField).at(1);
     await tester.enterText(personField, 'Budi Santoso');
     await settleRealAsync(tester);
@@ -36,8 +40,7 @@ void main() {
     expect(find.text('Nothing hanging right now.'), findsNothing);
   });
 
-  testWidgets('save is disabled while the text field is empty',
-      (tester) async {
+  testWidgets('save is disabled while the text field is empty', (tester) async {
     await pumpApp(tester, db);
 
     await tester.tap(find.byType(FloatingActionButton));
@@ -49,8 +52,9 @@ void main() {
     expect(saveButton.onPressed, isNull);
   });
 
-  testWidgets('toggling direction to Waiting for persists incoming',
-      (tester) async {
+  testWidgets('toggling direction to Waiting for persists incoming', (
+    tester,
+  ) async {
     await pumpApp(tester, db);
 
     await tester.tap(find.byType(FloatingActionButton));
@@ -76,8 +80,9 @@ void main() {
     expect(loops!.single.commitment.direction, Direction.incoming);
   });
 
-  testWidgets('In 3 days chip stores follow-up at 09:00 three days out',
-      (tester) async {
+  testWidgets('In 3 days chip stores follow-up at 09:00 three days out', (
+    tester,
+  ) async {
     await pumpApp(tester, db);
 
     await tester.tap(find.byType(FloatingActionButton));

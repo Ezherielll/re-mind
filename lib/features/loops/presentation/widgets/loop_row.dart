@@ -12,13 +12,13 @@ class LoopRow extends StatelessWidget {
   const LoopRow({
     super.key,
     required this.item,
-    this.status,
+    required this.status,
     this.onTap,
     this.onTapPerson,
   });
 
   final LoopWithPerson item;
-  final DerivedStatus? status;
+  final DerivedStatus status;
   final VoidCallback? onTap;
   final void Function(Person person)? onTapPerson;
 
@@ -34,9 +34,7 @@ class LoopRow extends StatelessWidget {
             ? Icons.north_east
             : Icons.south_west,
         size: 22,
-        color: status == null
-            ? null
-            : statusColor(context, status!),
+        color: statusColor(context, status),
       ),
       title: Text(
         item.commitment.title,
@@ -67,16 +65,14 @@ class LoopRow extends StatelessWidget {
                 ),
               ),
             ),
-      trailing: status == null
-          ? null
-          : Container(
-              width: 10,
-              height: 10,
-              decoration: BoxDecoration(
-                color: statusColor(context, status!),
-                shape: BoxShape.circle,
-              ),
-            ),
+      trailing: Container(
+        width: 10,
+        height: 10,
+        decoration: BoxDecoration(
+          color: statusColor(context, status),
+          shape: BoxShape.circle,
+        ),
+      ),
       onTap: onTap,
     );
   }
