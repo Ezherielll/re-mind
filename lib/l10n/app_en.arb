@@ -13,5 +13,15 @@
   "save": "Save",
   "saved": "Saved",
   "personOpenCount": "{count} open",
-  "personNothingPending": "Nothing pending with {name}."
+  "personNothingPending": "Nothing pending with {name}.",
+  "dueLabel": "Due",
+  "noDueDate": "No due date",
+  "remindsLabel": "Reminds",
+  "reminderDefault": "Default",
+  "reminderTomorrow": "Tomorrow",
+  "reminderIn3Days": "In 3 days",
+  "reminderOnDue": "On due date",
+  "reminderCustom": "Custom…",
+  "remindExplainer": "Will remind {when}",
+  "clearDate": "Clear"
 }

@@ -53,4 +53,36 @@ class AppLocalizationsEn extends AppLocalizations {
   String personNothingPending(Object name) {
     return 'Nothing pending with $name.';
   }
+
+  @override
+  String get dueLabel => 'Due';
+
+  @override
+  String get noDueDate => 'No due date';
+
+  @override
+  String get remindsLabel => 'Reminds';
+
+  @override
+  String get reminderDefault => 'Default';
+
+  @override
+  String get reminderTomorrow => 'Tomorrow';
+
+  @override
+  String get reminderIn3Days => 'In 3 days';
+
+  @override
+  String get reminderOnDue => 'On due date';
+
+  @override
+  String get reminderCustom => 'Custom…';
+
+  @override
+  String remindExplainer(Object when) {
+    return 'Will remind $when';
+  }
+
+  @override
+  String get clearDate => 'Clear';
 }

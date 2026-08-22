@@ -32,7 +32,19 @@ abstract class LoopsRepository {
     required String title,
     required Direction direction,
     int? personId,
+    DateTime? dueDate,
+    DateTime? followUpAt,
   });
+
+  /// Re-plans a loop's dates (T04); bumps `updatedAt`.
+  Future<void> updateDates(
+    int id, {
+    DateTime? dueDate,
+    DateTime? followUpAt,
+  });
+
+  /// One-shot fetch of a loop with its person for the detail screen.
+  Future<LoopWithPerson?> getLoop(int id);
 }
 
 class DriftLoopsRepository implements LoopsRepository {
@@ -125,6 +137,8 @@ class DriftLoopsRepository implements LoopsRepository {
     required String title,
     required Direction direction,
     int? personId,
+    DateTime? dueDate,
+    DateTime? followUpAt,
   }) {
     return _db.transaction(() async {
       final commitment = await _db
@@ -135,6 +149,8 @@ class DriftLoopsRepository implements LoopsRepository {
               direction: direction,
               status: CommitmentStatus.open,
               personId: Value(personId),
+              dueDate: Value(dueDate),
+              followUpAt: Value(followUpAt),
             ),
           );
       await _db
@@ -142,5 +158,31 @@ class DriftLoopsRepository implements LoopsRepository {
           .insert(LoopEventsCompanion.insert(commitmentId: commitment.id, type: LoopEventType.created));
       return commitment;
     });
+  }
+
+  @override
+  Future<void> updateDates(
+    int id, {
+    DateTime? dueDate,
+    DateTime? followUpAt,
+  }) async {
+    await (_db.update(_db.commitments)..where((c) => c.id.equals(id))).write(
+      CommitmentsCompanion(
+        dueDate: Value(dueDate),
+        followUpAt: Value(followUpAt),
+        updatedAt: Value(DateTime.now()),
+      ),
+    );
+  }
+
+  @override
+  Future<LoopWithPerson?> getLoop(int id) async {
+    final query = _openLoopsQuery(extraWhere: _db.commitments.id.equals(id));
+    final rows = await query.get();
+    if (rows.isEmpty) return null;
+    return LoopWithPerson(
+      rows.first.readTable(_db.commitments),
+      rows.first.readTableOrNull(_db.people),
+    );
   }
 }

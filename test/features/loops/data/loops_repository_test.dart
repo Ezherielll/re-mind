@@ -173,4 +173,59 @@ void main() {
       expect(budisLoops.single.commitment.title, 'For Budi');
     });
   });
+
+  group('dates & detail', () {
+    test('createCommitment stores provided dates', () async {
+      final due = DateTime(2026, 8, 28, 9);
+      final remind = DateTime(2026, 8, 27, 9);
+      final loop = await repository.createCommitment(
+        title: 'Send revision',
+        direction: Direction.outgoing,
+        dueDate: due,
+        followUpAt: remind,
+      );
+      expect(loop.dueDate, due);
+      expect(loop.followUpAt, remind);
+    });
+
+    test('getLoop returns the joined loop by id', () async {
+      final person = await repository.findOrCreatePerson('Budi');
+      final created = await repository.createCommitment(
+        title: 'Send revision',
+        direction: Direction.outgoing,
+        personId: person.id,
+      );
+
+      final fetched = await repository.getLoop(created.id);
+
+      expect(fetched, isNotNull);
+      expect(fetched!.commitment.title, 'Send revision');
+      expect(fetched.person?.name, 'Budi');
+    });
+
+    test('updateDates persists values and bumps updatedAt', () async {
+      final created = await repository.createCommitment(
+        title: 'Send revision',
+        direction: Direction.outgoing,
+      );
+      final newDue = DateTime(2026, 9, 1, 9);
+      final newRemind = DateTime(2026, 8, 31, 9);
+
+      await Future<void>.delayed(const Duration(milliseconds: 10));
+      await repository.updateDates(
+        created.id,
+        dueDate: newDue,
+        followUpAt: newRemind,
+      );
+
+      final after = (await repository.getLoop(created.id))!;
+      expect(after.commitment.dueDate, newDue);
+      expect(after.commitment.followUpAt, newRemind);
+      // Drift persists timestamps at second precision.
+      expect(
+        after.commitment.updatedAt.millisecondsSinceEpoch,
+        greaterThanOrEqualTo(created.updatedAt.millisecondsSinceEpoch),
+      );
+    });
+  });
 }

@@ -177,6 +177,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Nothing pending with {name}.'**
   String personNothingPending(Object name);
+
+  /// No description provided for @dueLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Due'**
+  String get dueLabel;
+
+  /// No description provided for @noDueDate.
+  ///
+  /// In en, this message translates to:
+  /// **'No due date'**
+  String get noDueDate;
+
+  /// No description provided for @remindsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminds'**
+  String get remindsLabel;
+
+  /// No description provided for @reminderDefault.
+  ///
+  /// In en, this message translates to:
+  /// **'Default'**
+  String get reminderDefault;
+
+  /// No description provided for @reminderTomorrow.
+  ///
+  /// In en, this message translates to:
+  /// **'Tomorrow'**
+  String get reminderTomorrow;
+
+  /// No description provided for @reminderIn3Days.
+  ///
+  /// In en, this message translates to:
+  /// **'In 3 days'**
+  String get reminderIn3Days;
+
+  /// No description provided for @reminderOnDue.
+  ///
+  /// In en, this message translates to:
+  /// **'On due date'**
+  String get reminderOnDue;
+
+  /// No description provided for @reminderCustom.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom…'**
+  String get reminderCustom;
+
+  /// No description provided for @remindExplainer.
+  ///
+  /// In en, this message translates to:
+  /// **'Will remind {when}'**
+  String remindExplainer(Object when);
+
+  /// No description provided for @clearDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get clearDate;
 }
 
 class _AppLocalizationsDelegate

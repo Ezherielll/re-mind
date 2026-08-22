@@ -70,4 +70,30 @@ void main() {
     );
     expect(loops!.single.commitment.direction, Direction.incoming);
   });
+
+  testWidgets('In 3 days chip stores follow-up at 09:00 three days out',
+      (tester) async {
+    await pumpApp(tester, db);
+
+    await tester.tap(find.byType(FloatingActionButton));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField).first, 'Chase invoice');
+    await tester.pump();
+    await tester.tap(find.text('In 3 days'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(FilledButton, 'Save'));
+    await settleRealAsync(tester);
+
+    final loops = await tester.runAsync(
+      () => DriftLoopsRepository(db).watchOpenLoops().first,
+    );
+    final stored = loops!.single.commitment;
+    final expected = DateTime(
+      DateTime.now().add(const Duration(days: 3)).year,
+      DateTime.now().add(const Duration(days: 3)).month,
+      DateTime.now().add(const Duration(days: 3)).day,
+      9,
+    );
+    expect(stored.followUpAt, expected);
+  });
 }

@@ -5,6 +5,7 @@ import '../../../l10n/app_localizations.dart';
 import '../data/loops_repository.dart';
 import '../data/providers.dart';
 import 'capture_sheet.dart';
+import 'loop_detail_screen.dart';
 import 'person_screen.dart';
 import 'widgets/loop_row.dart';
 
@@ -103,6 +104,11 @@ class _LoopList extends StatelessWidget {
         final item = items[index];
         return LoopRow(
           item: item,
+          onTap: () => Navigator.of(context).push(
+            MaterialPageRoute<void>(
+              builder: (_) => LoopDetailScreen(loopId: item.commitment.id),
+            ),
+          ),
           onTapPerson: item.person == null
               ? null
               : (person) => Navigator.of(context).push(
