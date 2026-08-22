@@ -88,16 +88,66 @@ class PersonScreen extends ConsumerWidget {
                     builder: (context, snap) {
                       final loops = snap.data ?? const [];
                       if (loops.isEmpty) {
-                        return Center(
-                          child: Text(
-                            l10n.personNothingPending(person.name),
-                            style: Theme.of(context).textTheme.bodyMedium
-                                ?.copyWith(
-                                  color: Theme.of(
-                                    context,
-                                  ).colorScheme.onSurfaceVariant,
-                                ),
-                          ),
+                        // Archived-only person: still surface the archived
+                        // section below the empty message (T11).
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const SizedBox(height: 8),
+                            Center(
+                              child: Text(
+                                l10n.personNothingPending(person.name),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyMedium
+                                    ?.copyWith(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurfaceVariant,
+                                    ),
+                              ),
+                            ),
+                            Expanded(
+                              child: StreamBuilder<List<LoopWithPerson>>(
+                                stream: repository
+                                    .watchDoneLoopsByPerson(personId),
+                                builder: (context, snap2) {
+                                  final done = snap2.data ?? const [];
+                                  if (done.isEmpty) {
+                                    return const SizedBox.shrink();
+                                  }
+                                  return ListView(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 16,
+                                    ),
+                                    children: [
+                                      ExpansionTile(
+                                        tilePadding: EdgeInsets.zero,
+                                        title: Text(
+                                          '${l10n.archivedLabel} · ${done.length}',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .labelMedium
+                                              ?.copyWith(
+                                                fontWeight:
+                                                    FontWeight.w600,
+                                              ),
+                                        ),
+                                        children: [
+                                          for (final item in done)
+                                            LoopRow(
+                                              item: item,
+                                              status:
+                                                  DerivedStatus.onTrack,
+                                            ),
+                                        ],
+                                      ),
+                                    ],
+                                  );
+                                },
+                              ),
+                            ),
+                          ],
                         );
                       }
 

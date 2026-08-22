@@ -55,5 +55,6 @@
   "searchLoopsLabel": "Loops",
   "noMatches": "No matches",
   "historyLabel": "History",
+  "eventCreated": "Created",
   "archivedLabel": "Archived"
 }

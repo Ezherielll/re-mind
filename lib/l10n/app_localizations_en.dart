@@ -188,5 +188,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get historyLabel => 'History';
 
   @override
+  String get eventCreated => 'Created';
+
+  @override
   String get archivedLabel => 'Archived';
 }

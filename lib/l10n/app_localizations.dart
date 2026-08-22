@@ -424,6 +424,12 @@ abstract class AppLocalizations {
   /// **'History'**
   String get historyLabel;
 
+  /// No description provided for @eventCreated.
+  ///
+  /// In en, this message translates to:
+  /// **'Created'**
+  String get eventCreated;
+
   /// No description provided for @archivedLabel.
   ///
   /// In en, this message translates to:

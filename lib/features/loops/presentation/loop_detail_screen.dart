@@ -333,10 +333,9 @@ class _LoopDetailScreenState extends ConsumerState<LoopDetailScreen> {
                                         Icons.check_circle_outline,
                                     }),
                                     title: Text(switch (e.type) {
-                                      LoopEventType.created => 'Created',
-                                      LoopEventType.followedUp =>
-                                        'Followed up',
-                                      LoopEventType.done => 'Done',
+                                      LoopEventType.created => l10n.eventCreated,
+                                      LoopEventType.followedUp => l10n.followedUpLabel,
+                                      LoopEventType.done => l10n.doneLabel,
                                     }),
                                     trailing: Text(
                                       DateFormat('d MMM, HH:mm')
