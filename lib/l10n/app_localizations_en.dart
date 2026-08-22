@@ -85,4 +85,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get clearDate => 'Clear';
+
+  @override
+  String get noneLabel => '—';
 }

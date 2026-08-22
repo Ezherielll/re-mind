@@ -6,9 +6,7 @@ import '../../../core/db/app_database.dart';
 import '../../../core/domain/commitment.dart';
 import '../../../l10n/app_localizations.dart';
 import '../data/providers.dart';
-import '../domain/follow_up_schedule.dart';
-
-/// Capture flow (page spec: design-system/re-mind/pages/capture.md).
+import '../domain/follow_up_schedule.dart';/// Capture flow (page spec: design-system/re-mind/pages/capture.md).
 /// T04 adds the optional due-date row, reminder chips, and the live
 /// explainer line. Save computes the plan via [computeSchedule].
 enum _Reminder { standard, tomorrow, in3Days, onDue, custom }
@@ -57,23 +55,23 @@ class _CaptureSheetState extends ConsumerState<CaptureSheet> {
     if (mounted) setState(() => _suggestions = results);
   }
 
-  SchedulePlan get _plan => computeSchedule(
-        direction: _direction,
-        now: DateTime.now(),
-        dueDate: _dueDate,
-        followUpAt: switch (_reminder) {
-          _Reminder.standard => null,
-          _Reminder.tomorrow =>
-            _at(DateTime.now().add(const Duration(days: 1))),
-          _Reminder.in3Days =>
-            _at(DateTime.now().add(const Duration(days: 3))),
-          _Reminder.onDue => _dueDate,
-          _Reminder.custom => _customFollowUp,
-        },
-      );
-
-  static DateTime _at(DateTime day) =>
-      DateTime(day.year, day.month, day.day, defaultReminderHour);
+  SchedulePlan get _plan {
+    final now = DateTime.now();
+    return computeSchedule(
+      direction: _direction,
+      now: now,
+      dueDate: _dueDate,
+      followUpAt: switch (_reminder) {
+        _Reminder.standard => null,
+        _Reminder.tomorrow =>
+          atReminderHour(now.add(const Duration(days: 1))),
+        _Reminder.in3Days =>
+          atReminderHour(now.add(const Duration(days: 3))),
+        _Reminder.onDue => _dueDate,
+        _Reminder.custom => _customFollowUp,
+      },
+    );
+  }
 
   Future<void> _pickDueDate() async {
     final picked = await showDatePicker(
@@ -84,7 +82,7 @@ class _CaptureSheetState extends ConsumerState<CaptureSheet> {
     );
     if (picked == null || !mounted) return;
     setState(() {
-      _dueDate = _at(picked);
+      _dueDate = atReminderHour(picked);
       if (_reminder == _Reminder.custom && _customFollowUp == null) {
         _reminder = _Reminder.standard;
       }
@@ -100,7 +98,7 @@ class _CaptureSheetState extends ConsumerState<CaptureSheet> {
     );
     if (picked == null || !mounted) return;
     setState(() {
-      _customFollowUp = _at(picked);
+      _customFollowUp = atReminderHour(picked);
       _reminder = _Reminder.custom;
     });
   }
@@ -222,10 +220,16 @@ class _CaptureSheetState extends ConsumerState<CaptureSheet> {
                         _Reminder.custom => l10n.reminderCustom,
                       }),
                       selected: _reminder == choice,
-                      onSelected: (_) {
+                      onSelected: (_) async {
                         if (choice == _Reminder.custom) {
-                          _pickCustomReminder();
+                          await _pickCustomReminder();
                           return;
+                        }
+                        // "On due date" without a due date first opens the
+                        // due picker — the chip must never silently no-op.
+                        if (choice == _Reminder.onDue && _dueDate == null) {
+                          await _pickDueDate();
+                          if (!mounted || _dueDate == null) return;
                         }
                         setState(() => _reminder = choice);
                       },

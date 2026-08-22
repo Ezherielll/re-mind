@@ -9,6 +9,15 @@ class LoopWithPerson {
   final Person? person;
 
   const LoopWithPerson(this.commitment, this.person);
+
+  static LoopWithPerson fromRow(
+    AppDatabase db,
+    TypedResult row,
+  ) =>
+      LoopWithPerson(
+        row.readTable(db.commitments),
+        row.readTableOrNull(db.people),
+      );
 }
 
 /// Persistence seam for open loops (ADR-0009). UI and controllers depend on
@@ -73,14 +82,9 @@ class DriftLoopsRepository implements LoopsRepository {
 
   @override
   Stream<List<LoopWithPerson>> watchOpenLoops() {
-    return _openLoopsQuery().watch().map(
-          (rows) => rows
-              .map((row) => LoopWithPerson(
-                    row.readTable(_db.commitments),
-                    row.readTableOrNull(_db.people),
-                  ))
-              .toList(),
-        );
+    return _openLoopsQuery()
+        .watch()
+        .map((rows) => rows.map((row) => LoopWithPerson.fromRow(_db, row)).toList());
   }
 
   @override
@@ -89,10 +93,7 @@ class DriftLoopsRepository implements LoopsRepository {
       extraWhere: _db.commitments.personId.equals(personId),
     ).watch().map(
           (rows) => rows
-              .map((row) => LoopWithPerson(
-                    row.readTable(_db.commitments),
-                    row.readTableOrNull(_db.people),
-                  ))
+              .map((row) => LoopWithPerson.fromRow(_db, row))
               .toList(),
         );
   }
@@ -127,7 +128,7 @@ class DriftLoopsRepository implements LoopsRepository {
     final normalized = _normalize(prefix);
     return (_db.select(_db.people)
           ..where((p) => p.deletedAt.isNull())
-          ..where((p) => p.normalizedName.like('%$normalized%'))
+          ..where((p) => p.normalizedName.like('$normalized%'))
           ..limit(limit))
         .get();
   }
@@ -180,9 +181,6 @@ class DriftLoopsRepository implements LoopsRepository {
     final query = _openLoopsQuery(extraWhere: _db.commitments.id.equals(id));
     final rows = await query.get();
     if (rows.isEmpty) return null;
-    return LoopWithPerson(
-      rows.first.readTable(_db.commitments),
-      rows.first.readTableOrNull(_db.people),
-    );
+    return LoopWithPerson.fromRow(_db, rows.first);
   }
 }

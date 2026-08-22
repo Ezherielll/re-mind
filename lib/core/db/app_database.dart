@@ -65,12 +65,15 @@ class LoopEvents extends Table {
 }
 
 /// A counterparty, lazily created from free text during capture (CONTEXT.md).
-/// `normalizedName` is the dedupe key; `name` preserves what the user typed.
+/// `normalizedName` is the dedupe key (enforced transactionally in
+/// findOrCreatePerson — deliberately NOT a UNIQUE constraint so a
+/// soft-deleted person's name can be recreated, ADR-0004/0001 interplay);
+/// `name` preserves what the user typed.
 @DataClassName('Person')
 class People extends Table {
   IntColumn get id => integer().autoIncrement()();
   TextColumn get name => text()();
-  TextColumn get normalizedName => text().unique()();
+  TextColumn get normalizedName => text()();
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
   DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
   DateTimeColumn get deletedAt => dateTime().nullable()();

@@ -23,5 +23,6 @@
   "reminderOnDue": "On due date",
   "reminderCustom": "Custom…",
   "remindExplainer": "Will remind {when}",
-  "clearDate": "Clear"
+  "clearDate": "Clear",
+  "noneLabel": "—"
 }

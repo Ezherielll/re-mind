@@ -67,5 +67,16 @@ void main() {
       expect(plan.followUpAt, chosen);
       expect(plan.dueDate, at9(8, 28));
     });
+
+    test('"on due date" chip stores the due date as the nudge', () {
+      final friday = at9(8, 28);
+      final plan = computeSchedule(
+        direction: Direction.outgoing,
+        now: monday,
+        dueDate: friday,
+        followUpAt: friday,
+      );
+      expect(plan.followUpAt, friday);
+    });
   });
 }

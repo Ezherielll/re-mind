@@ -133,7 +133,7 @@ class _LoopDetailScreenState extends ConsumerState<LoopDetailScreen> {
                               icon: Icons.notifications_none,
                               label: l10n.remindsLabel,
                               value: loop.commitment.followUpAt == null
-                                  ? '—'
+                                  ? l10n.noneLabel
                                   : _fmt(loop.commitment.followUpAt!),
                               onTap: () => _pickDate(isDue: false),
                             ),

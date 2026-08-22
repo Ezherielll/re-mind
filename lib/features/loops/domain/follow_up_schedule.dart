@@ -5,8 +5,11 @@ import 'package:re_mind/core/domain/commitment.dart';
 /// Pure function: no clock reads, no I/O — the caller supplies `now`.
 const defaultReminderHour = 9;
 
-DateTime _atNine(DateTime day) =>
+/// Snaps a picked date to the default reminder time (09:00 local).
+DateTime atReminderHour(DateTime day) =>
     DateTime(day.year, day.month, day.day, defaultReminderHour);
+
+DateTime _atNine(DateTime day) => atReminderHour(day);
 
 DateTime _plusThreeDays(DateTime now) {
   final candidate = _atNine(now.add(const Duration(days: 3)));

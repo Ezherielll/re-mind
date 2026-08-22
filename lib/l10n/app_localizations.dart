@@ -237,6 +237,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Clear'**
   String get clearDate;
+
+  /// No description provided for @noneLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'—'**
+  String get noneLabel;
 }
 
 class _AppLocalizationsDelegate
