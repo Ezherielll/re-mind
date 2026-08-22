@@ -276,9 +276,7 @@ class _GroupedList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final children = <Widget>[];
-    if (sampleIds.isNotEmpty) {
-      children.add(_SampleBanner(onRemove: onRemoveSamples));
-    }
+
     if (sampleIds.isNotEmpty) {
       children.add(_SampleBanner(onRemove: onRemoveSamples));
     }

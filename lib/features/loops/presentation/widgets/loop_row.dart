@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/db/app_database.dart';
 import '../../../../core/domain/commitment.dart';
 import '../../../../core/domain/derived_status.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../data/loops_repository.dart';
 import '../home_groups.dart';
 
@@ -59,7 +60,7 @@ class LoopRow extends StatelessWidget {
                 borderRadius: BorderRadius.circular(4),
               ),
               child: Text(
-                'Sample',
+                AppLocalizations.of(context).sampleTag,
                 style: Theme.of(context).textTheme.labelSmall,
               ),
             ),

@@ -127,12 +127,13 @@ class _CaptureSheetState extends ConsumerState<CaptureSheet> {
       followUpAt: plan.followUpAt,
     );
     // Ask for notification permission right after the first real save.
+    // Flag is persisted AFTER the attempt so a transient failure can retry.
     final db = ref.read(databaseProvider);
     if (await db.getSetting('perm_asked') == null) {
-      await db.setSetting('perm_asked', '1');
       try {
         await ref.read(reminderSchedulerProvider).requestPermission();
       } catch (_) {}
+      await db.setSetting('perm_asked', '1');
     }
     if (!mounted) return;
     Navigator.of(context).pop();
