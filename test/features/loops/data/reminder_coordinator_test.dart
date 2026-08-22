@@ -12,6 +12,7 @@ class FakeScheduler implements ReminderScheduler {
   @override
   Future<void> scheduleItemAlert({
     required int loopId,
+    int? notificationPayloadId,
     required String title,
     required DateTime at,
   }) async {

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/db/app_database.dart';
 import '../../../core/db/providers.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../loops/data/providers.dart';
 
 /// User's chosen daily check-in time as (hour, minute); null = never set.
 final digestTimeProvider = FutureProvider<(int, int)?>((ref) async {
@@ -63,6 +64,13 @@ class SettingsScreen extends ConsumerWidget {
                       '${picked.hour}:${picked.minute}',
                     );
                 ref.invalidate(digestTimeProvider);
+                // Re-sync so the digest is rescheduled with the new time.
+                ref.invalidate(openLoopsProvider);
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context)
+                    ..hideCurrentSnackBar()
+                    ..showSnackBar(SnackBar(content: Text(l10n.saved)));
+                }
               },
             ),
           ],

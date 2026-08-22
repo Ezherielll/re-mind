@@ -54,6 +54,7 @@ class RealReminderScheduler implements ReminderScheduler {
   @override
   Future<void> scheduleItemAlert({
     required int loopId,
+    int? notificationPayloadId,
     required String title,
     required DateTime at,
   }) async {
@@ -61,7 +62,7 @@ class RealReminderScheduler implements ReminderScheduler {
       id: loopId,
       title: 'Re:Mind',
       body: title,
-      payload: '$loopId',
+      payload: '${notificationPayloadId ?? loopId}',
       scheduledDate: _tz(at),
       notificationDetails: const NotificationDetails(
         android: AndroidNotificationDetails(

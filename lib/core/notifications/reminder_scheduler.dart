@@ -2,9 +2,12 @@
 /// daily digest; no exact alarms). Logic/tests depend on this interface;
 /// [RealReminderScheduler] isolates flutter_local_notifications.
 abstract class ReminderScheduler {
-  /// One-shot alert for an open loop's followUpAt.
+  /// One-shot alert for an open loop's followUpAt. [notificationPayloadId]
+  /// lets callers decouple the Android notification id from the loop id
+  /// carried in the payload (due-today alerts offset the id).
   Future<void> scheduleItemAlert({
     required int loopId,
+    int? notificationPayloadId,
     required String title,
     required DateTime at,
   });

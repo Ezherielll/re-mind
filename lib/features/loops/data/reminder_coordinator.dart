@@ -22,6 +22,7 @@ class ReminderCoordinator {
 
   Future<void> sync(
     List<LoopWithPerson> openLoops, {
+    String Function(String title)? dueTodayTitle,
     DateTime? now,
     String? digestBody,
     (int, int)? digestTime,
@@ -36,15 +37,13 @@ class ReminderCoordinator {
       }
       final due = l.commitment.dueDate;
       if (isDueToday(due, effectiveNow)) {
-        final fireAt = DateTime(
-          due!.year,
-          due.month,
-          due.day,
-          9,
-        ).isAfter(effectiveNow)
-            ? DateTime(due.year, due.month, due.day, 9)
-            : effectiveNow.add(const Duration(minutes: 1));
-        dueToday[l.commitment.id] = fireAt;
+        // Fire at 09:00 on the due day; if that moment already passed we
+        // skip entirely (no cancel/reschedule churn on every emission).
+        final d = due!;
+        final fireAt = DateTime(d.year, d.month, d.day, 9);
+        if (fireAt.isAfter(effectiveNow)) {
+          dueToday[l.commitment.id] = fireAt;
+        }
       }
     }
 
@@ -86,7 +85,8 @@ class ReminderCoordinator {
       cancel: (id) => _scheduler.cancelItemAlert(id + dueTodayIdOffset),
       schedule: (id, at, title) => _scheduler.scheduleItemAlert(
         loopId: id + dueTodayIdOffset,
-        title: 'Due today: $title',
+          notificationPayloadId: id,
+          title: dueTodayTitle == null ? title : dueTodayTitle(title),
         at: at,
       ),
     );
@@ -100,8 +100,6 @@ class ReminderCoordinator {
     }
   }
 }
-
-/// Sentinel distinguishing...
 
 final reminderSchedulerProvider = Provider<ReminderScheduler>(
   (ref) => throw UnimplementedError('override with RealReminderScheduler in main'),

@@ -50,6 +50,7 @@ class HomeScreen extends ConsumerWidget {
         ref.read(reminderCoordinatorProvider).sync(
               items,
               now: now,
+              dueTodayTitle: (t) => '${l10n.statusDue}: $t',
               digestTime: ref.watch(digestTimeProvider).value,
               digestBody: composeDigestBody(
                 totalOpen: items.length,

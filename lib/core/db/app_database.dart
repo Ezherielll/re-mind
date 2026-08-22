@@ -29,9 +29,15 @@ class AppDatabase extends _$AppDatabase {
     onUpgrade: (m, from, to) async {},
   );
 
-  static LazyDatabase _openConnection() => LazyDatabase(() async {
+  /// Canonical on-disk location — also used by the background shade-action
+  /// isolate to open the same database.
+  static Future<String> filePath() async {
     final dir = await getApplicationDocumentsDirectory();
-    final file = File(p.join(dir.path, 're_mind.sqlite'));
+    return p.join(dir.path, 're_mind.sqlite');
+  }
+
+  static LazyDatabase _openConnection() => LazyDatabase(() async {
+    final file = File(await filePath());
     return NativeDatabase.createInBackground(file);
   });
 }
