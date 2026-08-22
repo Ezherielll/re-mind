@@ -1,17 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/domain/commitment.dart';
+import '../../../core/domain/derived_status.dart';
 import '../../../l10n/app_localizations.dart';
-import '../data/loops_repository.dart';
 import '../data/providers.dart';
 import 'capture_sheet.dart';
+import 'home_groups.dart';
 import 'loop_detail_screen.dart';
 import 'person_screen.dart';
 import 'widgets/loop_row.dart';
 
+/// Active direction filter on the home list (null = All).
+class DirectionFilter extends Notifier<Direction?> {
+  @override
+  Direction? build() => null;
+
+  void set(Direction? direction) => state = direction;
+}
+
+final directionFilterProvider =
+    NotifierProvider<DirectionFilter, Direction?>(DirectionFilter.new);
+
 /// Home screen: the single prioritized open-loop list (page spec:
-/// design-system/re-mind/pages/home.md). Grouping by derived status arrives
-/// with T05; rows are flat until then.
+/// design-system/re-mind/pages/home.md). Grouped by derived status via
+/// [groupOpenLoops]; filter chips narrow by Direction.
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
@@ -27,13 +40,21 @@ class HomeScreen extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 24),
-              Text(
-                l10n.homeTitle,
-                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: -0.02,
-                    ),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    l10n.homeTitle,
+                    style:
+                        Theme.of(context).textTheme.headlineMedium?.copyWith(
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: -0.02,
+                            ),
+                  ),
+                ],
               ),
+              const SizedBox(height: 8),
+              _FilterChips(),
               Expanded(
                 child: loops.when(
                   loading: () => const SizedBox.shrink(),
@@ -46,9 +67,16 @@ class HomeScreen extends ConsumerWidget {
                           ),
                     ),
                   ),
-                  data: (items) => items.isEmpty
-                      ? const _EmptyState()
-                      : _LoopList(items),
+                  data: (items) {
+                    final groups = groupOpenLoops(
+                      items,
+                      directionFilter: ref.watch(directionFilterProvider),
+                    );
+                    if (groups.isEmpty) {
+                      return const _EmptyState();
+                    }
+                    return _GroupedList(groups);
+                  },
                 ),
               ),
             ],
@@ -60,6 +88,57 @@ class HomeScreen extends ConsumerWidget {
         icon: const Icon(Icons.add),
         label: Text(l10n.homeCaptureLabel),
       ),
+    );
+  }
+}
+
+class _FilterChips extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    final selected = ref.watch(directionFilterProvider);
+    return Row(
+      children: [
+        _chip(
+          context,
+          label: l10n.filterAll,
+          selected: selected == null,
+          onSelected: () =>
+              ref.read(directionFilterProvider.notifier).set(null),
+        ),
+        const SizedBox(width: 8),
+        _chip(
+          context,
+          label: l10n.directionOutgoing,
+          selected: selected == Direction.outgoing,
+          onSelected: () => ref
+              .read(directionFilterProvider.notifier)
+              .set(Direction.outgoing),
+        ),
+        const SizedBox(width: 8),
+        _chip(
+          context,
+          label: l10n.directionIncoming,
+          selected: selected == Direction.incoming,
+          onSelected: () => ref
+              .read(directionFilterProvider.notifier)
+              .set(Direction.incoming),
+        ),
+      ],
+    );
+  }
+
+  Widget _chip(
+    BuildContext context, {
+    required String label,
+    required bool selected,
+    required VoidCallback onSelected,
+  }) {
+    return ChoiceChip(
+      label: Text(label),
+      selected: selected,
+      onSelected: (_) => onSelected(),
+      visualDensity: VisualDensity.compact,
     );
   }
 }
@@ -89,21 +168,20 @@ class _EmptyState extends StatelessWidget {
   }
 }
 
-class _LoopList extends StatelessWidget {
-  const _LoopList(this.items);
+class _GroupedList extends StatelessWidget {
+  const _GroupedList(this.groups);
 
-  final List<LoopWithPerson> items;
+  final List<LoopGroup> groups;
 
   @override
   Widget build(BuildContext context) {
-    return ListView.separated(
-      padding: const EdgeInsets.only(top: 8, bottom: 96),
-      itemCount: items.length,
-      separatorBuilder: (_, _) => const Divider(height: 1),
-      itemBuilder: (context, index) {
-        final item = items[index];
-        return LoopRow(
+    final children = <Widget>[];
+    for (final group in groups) {
+      children.add(_GroupHeader(status: group.status, count: group.loops.length));
+      for (final item in group.loops) {
+        children.add(LoopRow(
           item: item,
+          status: group.status,
           onTap: () => Navigator.of(context).push(
             MaterialPageRoute<void>(
               builder: (_) => LoopDetailScreen(loopId: item.commitment.id),
@@ -116,8 +194,54 @@ class _LoopList extends StatelessWidget {
                       builder: (_) => PersonScreen(personId: person.id),
                     ),
                   ),
-        );
-      },
+        ));
+        children.add(const Divider(height: 1));
+      }
+      children.add(const SizedBox(height: 16));
+    }
+    return ListView(
+      padding: const EdgeInsets.only(top: 4, bottom: 96),
+      children: children,
+    );
+  }
+}
+
+class _GroupHeader extends StatelessWidget {
+  const _GroupHeader({required this.status, required this.count});
+
+  final DerivedStatus status;
+  final int count;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final label = switch (status) {
+      DerivedStatus.followUpDue => l10n.statusFollowUpDue,
+      DerivedStatus.due => l10n.statusDue,
+      DerivedStatus.upcoming => l10n.statusUpcoming,
+      DerivedStatus.onTrack => l10n.statusOnTrack,
+    };
+    return Padding(
+      padding: const EdgeInsets.only(top: 12, bottom: 2),
+      child: Row(
+        children: [
+          Text(
+            label.toUpperCase(),
+            style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 0.05,
+                  color: statusColor(context, status),
+                ),
+          ),
+          const SizedBox(width: 6),
+          Text(
+            '· $count',
+            style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+          ),
+        ],
+      ),
     );
   }
 }

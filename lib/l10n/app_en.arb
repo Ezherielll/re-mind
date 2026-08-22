@@ -24,5 +24,10 @@
   "reminderCustom": "Custom…",
   "remindExplainer": "Will remind {when}",
   "clearDate": "Clear",
-  "noneLabel": "—"
+  "noneLabel": "—",
+  "filterAll": "All",
+  "statusFollowUpDue": "Follow-up due",
+  "statusDue": "Due",
+  "statusUpcoming": "Upcoming",
+  "statusOnTrack": "On track"
 }

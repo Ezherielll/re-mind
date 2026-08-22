@@ -60,7 +60,12 @@ void main() {
       'Awaiting data from Budi',
     );
     await tester.pump(); // rebuild with the Save button enabled
-    await tester.tap(find.text('Waiting for'));
+    await tester.tap(
+      find.descendant(
+        of: find.byType(SegmentedButton<Direction>),
+        matching: find.text('Waiting for'),
+      ),
+    );
     await tester.pumpAndSettle();
     await tester.tap(find.widgetWithText(FilledButton, 'Save'));
     await settleRealAsync(tester);

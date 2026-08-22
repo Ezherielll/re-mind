@@ -88,4 +88,19 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get noneLabel => '—';
+
+  @override
+  String get filterAll => 'All';
+
+  @override
+  String get statusFollowUpDue => 'Follow-up due';
+
+  @override
+  String get statusDue => 'Due';
+
+  @override
+  String get statusUpcoming => 'Upcoming';
+
+  @override
+  String get statusOnTrack => 'On track';
 }

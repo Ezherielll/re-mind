@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/domain/derived_status.dart';
 import '../../../l10n/app_localizations.dart';
 import '../data/providers.dart';
 import 'widgets/loop_row.dart';
@@ -112,8 +113,17 @@ class PersonScreen extends ConsumerWidget {
                         ),
                         itemCount: loops.length,
                         separatorBuilder: (_, _) => const Divider(height: 1),
-                        itemBuilder: (context, index) =>
-                            LoopRow(item: loops[index]),
+                        itemBuilder: (context, index) {
+                          final item = loops[index];
+                          return LoopRow(
+                            item: item,
+                            status: deriveStatus(
+                              now: DateTime.now(),
+                              followUpAt: item.commitment.followUpAt,
+                              dueDate: item.commitment.dueDate,
+                            ),
+                          );
+                        },
                       );
                     },
                   ),

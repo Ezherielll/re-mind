@@ -243,6 +243,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'—'**
   String get noneLabel;
+
+  /// No description provided for @filterAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get filterAll;
+
+  /// No description provided for @statusFollowUpDue.
+  ///
+  /// In en, this message translates to:
+  /// **'Follow-up due'**
+  String get statusFollowUpDue;
+
+  /// No description provided for @statusDue.
+  ///
+  /// In en, this message translates to:
+  /// **'Due'**
+  String get statusDue;
+
+  /// No description provided for @statusUpcoming.
+  ///
+  /// In en, this message translates to:
+  /// **'Upcoming'**
+  String get statusUpcoming;
+
+  /// No description provided for @statusOnTrack.
+  ///
+  /// In en, this message translates to:
+  /// **'On track'**
+  String get statusOnTrack;
 }
 
 class _AppLocalizationsDelegate
