@@ -82,11 +82,15 @@ class RealBillingService implements BillingService {
 class ProStatus extends Notifier<bool> {
   @override
   bool build() {
-    Future(() async {
-      final v = await ref.read(databaseProvider).getSetting(proSettingKey);
-      state = v == '1';
-    });
+    Future(load);
     return false;
+  }
+
+  /// Reads the persisted entitlement; also the deterministic entry point
+  /// for tests (await this instead of sleeping on async build).
+  Future<void> load() async {
+    final v = await ref.read(databaseProvider).getSetting(proSettingKey);
+    state = v == '1';
   }
 
   Future<void> grant() async {

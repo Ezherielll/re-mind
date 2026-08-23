@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 
 
@@ -97,6 +98,25 @@ class SettingsScreen extends ConsumerWidget {
               leading: const Icon(Icons.history_outlined),
               title: Text(l10n.backupsLabel),
               onTap: () => SettingsActions.showBackupsSheet(context, ref),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              l10n.aboutGroup.toUpperCase(),
+              style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 0.05,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.privacy_tip_outlined),
+              title: Text(l10n.privacyNote),
+            ),
+            ListTile(
+              leading: const Icon(Icons.mail_outline),
+              title: Text(l10n.feedbackLabel),
+              onTap: () => launchUrl(Uri.parse(
+                  'mailto:feedback@example.com?subject=Re:Mind%20feedback')),
             ),            const SizedBox(height: 16),
             Text(
               'PRO',

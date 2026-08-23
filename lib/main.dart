@@ -40,12 +40,11 @@ Future<void> main() async {
     billingProvider.overrideWithValue(billing),
   ]);
 
-  runApp(
-    UncontrolledProviderScope(
-      container: container,
-      child: const ReMindApp(),
-    ),
-  );
+  // TODO(#15): re-add Sentry once the Kotlin toolchain is upgraded.
+  runApp(UncontrolledProviderScope(
+    container: container,
+    child: const ReMindApp(),
+  ));
 }
 
 class ReMindApp extends StatelessWidget {

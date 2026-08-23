@@ -257,5 +257,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get proBadge => 'PRO';
 
   @override
+  String get aboutGroup => 'About';
+
+  @override
+  String get versionLabel => 'Version';
+
+  @override
+  String get feedbackLabel => 'Send feedback';
+
+  @override
+  String get privacyNote => 'Your data stays on this device.';
+
+  @override
   String get proLockedToast => 'Unlock with Pro';
 }

@@ -562,6 +562,30 @@ abstract class AppLocalizations {
   /// **'PRO'**
   String get proBadge;
 
+  /// No description provided for @aboutGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'About'**
+  String get aboutGroup;
+
+  /// No description provided for @versionLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Version'**
+  String get versionLabel;
+
+  /// No description provided for @feedbackLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Send feedback'**
+  String get feedbackLabel;
+
+  /// No description provided for @privacyNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Your data stays on this device.'**
+  String get privacyNote;
+
   /// No description provided for @proLockedToast.
   ///
   /// In en, this message translates to:

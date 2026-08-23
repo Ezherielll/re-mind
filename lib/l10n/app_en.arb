@@ -78,5 +78,9 @@
   "proOwned": "Owned",
   "proError": "Purchase failed. Please try again.",
   "proBadge": "PRO",
+  "aboutGroup": "About",
+  "versionLabel": "Version",
+  "feedbackLabel": "Send feedback",
+  "privacyNote": "Your data stays on this device.",
   "proLockedToast": "Unlock with Pro"
 }
