@@ -68,33 +68,41 @@ Future<void> importJson(AppDatabase db, String raw) async {
     await db.delete(db.appSettings).go();
   }
 
-  await db.transaction(() async {
-    await wipeAll();
-    for (final j in (map['people'] as List?) ?? const []) {
-      await db
-          .into(db.people)
-          .insert(Person.fromJson(Map.from(j as Map)),
-              mode: InsertMode.insertOrReplace);
-    }
-    for (final j in (map['commitments'] as List?) ?? const []) {
-      await db
-          .into(db.commitments)
-          .insert(Commitment.fromJson(Map.from(j as Map)),
-              mode: InsertMode.insertOrReplace);
-    }
-    for (final j in (map['loopEvents'] as List?) ?? const []) {
-      await db
-          .into(db.loopEvents)
-          .insert(LoopEvent.fromJson(Map.from(j as Map)),
-              mode: InsertMode.insertOrReplace);
-    }
-    for (final j in (map['settings'] as List?) ?? const []) {
-      await db
-          .into(db.appSettings)
-          .insert(AppSetting.fromJson(Map.from(j as Map)),
-              mode: InsertMode.insertOrReplace);
-    }
-  });
+  try {
+    await db.transaction(() async {
+      await wipeAll();
+      for (final j in (map['people'] as List?) ?? const []) {
+        await db
+            .into(db.people)
+            .insert(Person.fromJson(Map.from(j as Map)),
+                mode: InsertMode.insertOrReplace);
+      }
+      for (final j in (map['commitments'] as List?) ?? const []) {
+        await db
+            .into(db.commitments)
+            .insert(Commitment.fromJson(Map.from(j as Map)),
+                mode: InsertMode.insertOrReplace);
+      }
+      for (final j in (map['loopEvents'] as List?) ?? const []) {
+        await db
+            .into(db.loopEvents)
+            .insert(LoopEvent.fromJson(Map.from(j as Map)),
+                mode: InsertMode.insertOrReplace);
+      }
+      for (final j in (map['settings'] as List?) ?? const []) {
+        await db
+            .into(db.appSettings)
+            .insert(AppSetting.fromJson(Map.from(j as Map)),
+                mode: InsertMode.insertOrReplace);
+      }
+    });
+  } on BackupException {
+    rethrow;
+  } catch (_) {
+    // Valid JSON envelope but corrupt row shapes — treat as malformed;
+    // the transaction has already rolled back any partial wipe.
+    throw const BackupException('malformed');
+  }
 }
 
 // ---- Rolling local backups (last 7 days) -------------------------------
