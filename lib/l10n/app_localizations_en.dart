@@ -192,4 +192,37 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get archivedLabel => 'Archived';
+
+  @override
+  String get dataGroup => 'Data';
+
+  @override
+  String get exportLabel => 'Export';
+
+  @override
+  String get importLabel => 'Import';
+
+  @override
+  String get backupsLabel => 'Backups';
+
+  @override
+  String get restoreLabel => 'Restore';
+
+  @override
+  String get confirmRestoreTitle => 'Restore this backup?';
+
+  @override
+  String get confirmRestoreBody => 'This replaces your current data.';
+
+  @override
+  String get cancelLabel => 'Cancel';
+
+  @override
+  String get backupRestored => 'Backup restored';
+
+  @override
+  String get backupInvalid => 'This file is not a valid Re:Mind backup';
+
+  @override
+  String get backupBadVersion => 'Unsupported backup version';
 }

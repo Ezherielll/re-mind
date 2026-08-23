@@ -435,6 +435,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Archived'**
   String get archivedLabel;
+
+  /// No description provided for @dataGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'Data'**
+  String get dataGroup;
+
+  /// No description provided for @exportLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Export'**
+  String get exportLabel;
+
+  /// No description provided for @importLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Import'**
+  String get importLabel;
+
+  /// No description provided for @backupsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Backups'**
+  String get backupsLabel;
+
+  /// No description provided for @restoreLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore'**
+  String get restoreLabel;
+
+  /// No description provided for @confirmRestoreTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore this backup?'**
+  String get confirmRestoreTitle;
+
+  /// No description provided for @confirmRestoreBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This replaces your current data.'**
+  String get confirmRestoreBody;
+
+  /// No description provided for @cancelLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get cancelLabel;
+
+  /// No description provided for @backupRestored.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup restored'**
+  String get backupRestored;
+
+  /// No description provided for @backupInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'This file is not a valid Re:Mind backup'**
+  String get backupInvalid;
+
+  /// No description provided for @backupBadVersion.
+  ///
+  /// In en, this message translates to:
+  /// **'Unsupported backup version'**
+  String get backupBadVersion;
 }
 
 class _AppLocalizationsDelegate

@@ -1,19 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+
+
 import '../../../core/db/app_database.dart';
 import '../../../core/db/providers.dart';
 import '../../../l10n/app_localizations.dart';
-import '../../loops/data/providers.dart';
+import 'settings_actions.dart';
 
-/// User's chosen daily check-in time as (hour, minute); null = never set.
-final digestTimeProvider = FutureProvider<(int, int)?>((ref) async {
-  final db = ref.watch(databaseProvider);
-  final raw = await db.getSetting(SettingsDao.digestKey);
-  if (raw == null) return null;
-  final parts = raw.split(':');
-  return (int.parse(parts[0]), int.parse(parts[1]));
-});
+
+import '../../loops/data/providers.dart';
+import '../../loops/presentation/home_screen.dart' show samplesProvider;
+
+// digestTimeProvider now lives in settings_actions.dart.
 
 /// Minimal settings screen (pages/settings.md, Preferences group only).
 /// Data/Pro/About groups arrive with T12/T13.
@@ -66,12 +65,37 @@ class SettingsScreen extends ConsumerWidget {
                 ref.invalidate(digestTimeProvider);
                 // Re-sync so the digest is rescheduled with the new time.
                 ref.invalidate(openLoopsProvider);
+                ref.invalidate(samplesProvider);
                 if (context.mounted) {
                   ScaffoldMessenger.of(context)
                     ..hideCurrentSnackBar()
                     ..showSnackBar(SnackBar(content: Text(l10n.saved)));
                 }
               },
+            ),
+            const SizedBox(height: 16),
+            Text(
+              l10n.dataGroup.toUpperCase(),
+              style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 0.05,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.ios_share),
+              title: Text(l10n.exportLabel),
+              onTap: () => SettingsActions.export(context, ref),
+            ),
+            ListTile(
+              leading: const Icon(Icons.download_outlined),
+              title: Text(l10n.importLabel),
+              onTap: () => SettingsActions.importBackup(context, ref),
+            ),
+            ListTile(
+              leading: const Icon(Icons.history_outlined),
+              title: Text(l10n.backupsLabel),
+              onTap: () => SettingsActions.showBackupsSheet(context, ref),
             ),
           ],
         ),

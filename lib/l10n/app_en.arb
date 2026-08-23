@@ -56,5 +56,16 @@
   "noMatches": "No matches",
   "historyLabel": "History",
   "eventCreated": "Created",
-  "archivedLabel": "Archived"
+  "archivedLabel": "Archived",
+  "dataGroup": "Data",
+  "exportLabel": "Export",
+  "importLabel": "Import",
+  "backupsLabel": "Backups",
+  "restoreLabel": "Restore",
+  "confirmRestoreTitle": "Restore this backup?",
+  "confirmRestoreBody": "This replaces your current data.",
+  "cancelLabel": "Cancel",
+  "backupRestored": "Backup restored",
+  "backupInvalid": "This file is not a valid Re:Mind backup",
+  "backupBadVersion": "Unsupported backup version"
 }
