@@ -225,4 +225,37 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get backupBadVersion => 'Unsupported backup version';
+
+  @override
+  String get proTitle => 'Re:Mind Pro';
+
+  @override
+  String get proBenefit1 => 'Custom themes';
+
+  @override
+  String get proBenefit2 => 'Advanced history views';
+
+  @override
+  String get proBenefit3 => 'Lifetime — pay once, keep forever';
+
+  @override
+  String get proOneTime => 'one time';
+
+  @override
+  String get proBuy => 'Buy lifetime';
+
+  @override
+  String get proRestorePurchases => 'Restore purchase';
+
+  @override
+  String get proOwned => 'Owned';
+
+  @override
+  String get proError => 'Purchase failed. Please try again.';
+
+  @override
+  String get proBadge => 'PRO';
+
+  @override
+  String get proLockedToast => 'Unlock with Pro';
 }

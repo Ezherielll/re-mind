@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../core/db/app_database.dart';
 import '../../../core/domain/commitment.dart';
 import '../../../core/domain/digest.dart';
 import '../../../core/domain/derived_status.dart';
@@ -19,10 +18,6 @@ import 'person_screen.dart';
 import 'search_screen.dart';
 import 'widgets/loop_row.dart';
 
-/// Sample loops still present (T09 banner).
-final samplesProvider = FutureProvider<List<Commitment>>(
-  (ref) => ref.watch(loopsRepositoryProvider).sampleLoops(),
-);
 
 /// Active direction filter on the home list (null = All).
 class DirectionFilter extends Notifier<Direction?> {

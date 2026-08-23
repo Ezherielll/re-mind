@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 
 import '../../../core/db/app_database.dart';
 import '../../../core/db/providers.dart';
+import '../../../core/db/settings_dao.dart';
 import '../../../core/domain/commitment.dart';
 import '../../../l10n/app_localizations.dart';
 import '../data/providers.dart';

@@ -6,11 +6,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
-import '../../../core/db/app_database.dart';
 import '../../../core/db/providers.dart';
+import '../../../core/db/settings_dao.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../loops/data/providers.dart';
-import '../../loops/presentation/home_screen.dart' show samplesProvider;
+
 import '../data/backup_service.dart';
 
 /// User's chosen daily check-in time as (hour, minute); null = never set.

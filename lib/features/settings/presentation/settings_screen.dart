@@ -3,14 +3,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 
 
-import '../../../core/db/app_database.dart';
 import '../../../core/db/providers.dart';
+import '../../../core/db/settings_dao.dart';
 import '../../../l10n/app_localizations.dart';
+import 'pro_sheet.dart';
+import 'pro_status.dart';
 import 'settings_actions.dart';
 
 
 import '../../loops/data/providers.dart';
-import '../../loops/presentation/home_screen.dart' show samplesProvider;
 
 // digestTimeProvider now lives in settings_actions.dart.
 
@@ -96,7 +97,34 @@ class SettingsScreen extends ConsumerWidget {
               leading: const Icon(Icons.history_outlined),
               title: Text(l10n.backupsLabel),
               onTap: () => SettingsActions.showBackupsSheet(context, ref),
+            ),            const SizedBox(height: 16),
+            Text(
+              'PRO',
+              style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 0.05,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
             ),
+            Consumer(builder: (context, ref2, _) {
+              final entitled = ref2.watch(proStatusProvider);
+              return ListTile(
+                leading: Icon(
+                  entitled
+                      ? Icons.verified_outlined
+                      : Icons.workspace_premium_outlined,
+                  color: entitled
+                      ? Theme.of(context).colorScheme.primary
+                      : Theme.of(context).colorScheme.secondary,
+                ),
+                title: Text(l10n.proTitle),
+                subtitle: entitled ? null : Text(l10n.proOneTime),
+                trailing: entitled
+                    ? const Icon(Icons.check)
+                    : const Icon(Icons.chevron_right),
+                onTap: () => ProSheet.show(context),
+              );
+            }),
           ],
         ),
       ),

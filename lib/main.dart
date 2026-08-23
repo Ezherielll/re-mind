@@ -7,6 +7,7 @@ import 'package:timezone/data/latest.dart' as tzdata;
 import 'package:timezone/timezone.dart' as tz;
 
 import 'core/notifications/real_reminder_scheduler.dart';
+import 'features/settings/presentation/pro_status.dart';
 import 'features/loops/data/reminder_coordinator.dart';
 import 'features/loops/data/sample_seed.dart';
 import 'features/settings/data/backup_service.dart';
@@ -26,11 +27,22 @@ Future<void> main() async {
   await bootstrapDb.close();
   final scheduler = await RealReminderScheduler.create();
   shadeDbPath = await AppDatabase.filePath();
+
+  final container = ProviderContainer(
+    overrides: [
+      reminderSchedulerProvider.overrideWithValue(scheduler),
+    ],
+  );
+  final billing = await RealBillingService(
+    () => container.read(proStatusProvider.notifier).grant(),
+  ).init();
+  container.updateOverrides([
+    billingProvider.overrideWithValue(billing),
+  ]);
+
   runApp(
-    ProviderScope(
-      overrides: [
-        reminderSchedulerProvider.overrideWithValue(scheduler),
-      ],
+    UncontrolledProviderScope(
+      container: container,
       child: const ReMindApp(),
     ),
   );

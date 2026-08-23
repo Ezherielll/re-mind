@@ -67,5 +67,16 @@
   "cancelLabel": "Cancel",
   "backupRestored": "Backup restored",
   "backupInvalid": "This file is not a valid Re:Mind backup",
-  "backupBadVersion": "Unsupported backup version"
+  "backupBadVersion": "Unsupported backup version",
+  "proTitle": "Re:Mind Pro",
+  "proBenefit1": "Custom themes",
+  "proBenefit2": "Advanced history views",
+  "proBenefit3": "Lifetime — pay once, keep forever",
+  "proOneTime": "one time",
+  "proBuy": "Buy lifetime",
+  "proRestorePurchases": "Restore purchase",
+  "proOwned": "Owned",
+  "proError": "Purchase failed. Please try again.",
+  "proBadge": "PRO",
+  "proLockedToast": "Unlock with Pro"
 }

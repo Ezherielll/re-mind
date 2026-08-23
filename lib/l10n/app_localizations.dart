@@ -501,6 +501,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Unsupported backup version'**
   String get backupBadVersion;
+
+  /// No description provided for @proTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Re:Mind Pro'**
+  String get proTitle;
+
+  /// No description provided for @proBenefit1.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom themes'**
+  String get proBenefit1;
+
+  /// No description provided for @proBenefit2.
+  ///
+  /// In en, this message translates to:
+  /// **'Advanced history views'**
+  String get proBenefit2;
+
+  /// No description provided for @proBenefit3.
+  ///
+  /// In en, this message translates to:
+  /// **'Lifetime — pay once, keep forever'**
+  String get proBenefit3;
+
+  /// No description provided for @proOneTime.
+  ///
+  /// In en, this message translates to:
+  /// **'one time'**
+  String get proOneTime;
+
+  /// No description provided for @proBuy.
+  ///
+  /// In en, this message translates to:
+  /// **'Buy lifetime'**
+  String get proBuy;
+
+  /// No description provided for @proRestorePurchases.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore purchase'**
+  String get proRestorePurchases;
+
+  /// No description provided for @proOwned.
+  ///
+  /// In en, this message translates to:
+  /// **'Owned'**
+  String get proOwned;
+
+  /// No description provided for @proError.
+  ///
+  /// In en, this message translates to:
+  /// **'Purchase failed. Please try again.'**
+  String get proError;
+
+  /// No description provided for @proBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'PRO'**
+  String get proBadge;
+
+  /// No description provided for @proLockedToast.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock with Pro'**
+  String get proLockedToast;
 }
 
 class _AppLocalizationsDelegate

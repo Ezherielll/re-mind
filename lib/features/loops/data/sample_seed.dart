@@ -1,6 +1,7 @@
 import 'package:drift/drift.dart';
 
 import '../../../core/db/app_database.dart';
+import '../../../core/db/settings_dao.dart';
 import '../../../core/domain/commitment.dart';
 
 const sampleFlagKey = 'samples_cleared';
