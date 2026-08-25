@@ -35,7 +35,9 @@ class SettingsActions {
     final file = File('${dir.path}/remind-backup.json');
     await file.writeAsString(json);
     try {
-      await Share.shareXFiles([XFile(file.path)], text: l10n.exportLabel);
+      await SharePlus.instance.share(
+        ShareParams(files: [XFile(file.path)], text: l10n.exportLabel),
+      );
     } catch (_) {}
   }
 
