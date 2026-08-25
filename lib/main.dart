@@ -39,6 +39,7 @@ Future<void> main() async {
   container.updateOverrides([
     billingProvider.overrideWithValue(billing),
   ]);
+  unawaited(container.read(proStatusProvider.notifier).load());
 
   // TODO(#15): re-add Sentry once the Kotlin toolchain is upgraded.
   runApp(UncontrolledProviderScope(

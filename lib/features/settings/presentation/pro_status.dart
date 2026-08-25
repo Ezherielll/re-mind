@@ -82,7 +82,6 @@ class RealBillingService implements BillingService {
 class ProStatus extends Notifier<bool> {
   @override
   bool build() {
-    Future(load);
     return false;
   }
 
