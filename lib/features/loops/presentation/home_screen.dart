@@ -126,7 +126,9 @@ class HomeScreen extends ConsumerWidget {
               _FilterChips(),
               Expanded(
                 child: AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 200),
+                  duration: MediaQuery.disableAnimationsOf(context)
+                      ? Duration.zero
+                      : const Duration(milliseconds: 200),
                   child: KeyedSubtree(
                     key: ValueKey(totalOpen),
                     child: loops.when(
